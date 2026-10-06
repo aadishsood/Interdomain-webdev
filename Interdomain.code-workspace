@@ -1,1 +1,21 @@
-{"folders":[{"path":"."}],"settings":{"liveServer.settings.root":"/"},"tasks":{"version":"2.0.0","tasks":[{"label":"Open Interdomain in Live Server","type":"shell","command":"code --reuse-window index.html","problemMatcher":[]}]}}
+{
+  "folders": [
+    {
+      "path": "."
+    }
+  ],
+  "settings": {
+    "liveServer.settings.root": "/"
+  },
+  "tasks": {
+    "version": "2.0.0",
+    "tasks": [
+      {
+        "label": "Open Interdomain in Live Server",
+        "type": "shell",
+        "command": "code --reuse-window index.html",
+        "problemMatcher": []
+      }
+    ]
+  }
+}
