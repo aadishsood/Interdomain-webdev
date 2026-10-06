@@ -83,8 +83,8 @@
     .social-btn { display:inline-flex; align-items:center; gap:7px; border-radius:999px; padding:10px 16px; font-size:.8rem; font-weight:600; background:var(--ink); color:var(--bg); transition:transform .2s, box-shadow .2s; }
     .social-btn:hover { transform:translateY(-2px); box-shadow:0 8px 16px rgba(0,0,0,.15); }
     .social-btn.alt { background:transparent; color:var(--ink); border:1px solid var(--line); }
-    .member-photo { width:116px; height:116px; border-radius:50% 50% 42% 58%; overflow:hidden; background:linear-gradient(135deg,var(--accent),#558b6a); display:grid; place-items:center; color:var(--accent-ink); font-weight:700; font-size:1.3rem; flex-shrink:0; }
-    .member-photo img { width:100%; height:100%; object-fit:cover; display:block; }
+    .member-photo { width:min(116px, 100%); aspect-ratio:1/1; border-radius:50%; overflow:hidden; background:linear-gradient(135deg,var(--accent),#558b6a); display:grid; place-items:center; color:var(--accent-ink); font-weight:700; font-size:1.3rem; flex-shrink:0; }
+    .member-photo img { width:100%; height:100%; object-fit:cover; object-position:center 40%; display:block; }
     .gallery { display:grid; grid-template-columns:1.2fr .8fr .8fr; grid-auto-rows:190px; gap:14px; }
     .tile { border-radius:22px; padding:19px; display:flex; align-items:flex-end; color:#f6fff2; position:relative; overflow:hidden; background:#23493e; }
     .tile:before { content:''; position:absolute; inset:-30%; background:repeating-radial-gradient(ellipse at 40% 60%,transparent 0 18px,rgba(194,255,117,.2) 19px 21px); transform:rotate(-17deg); }
@@ -116,7 +116,7 @@
     // ---- Team members 1-9: edit ONLY this data to fill a slot (card design is untouched) ----
     // image: '' shows a numbered placeholder; a URL/path shows the photo (cropped with object-fit, never stretched).
     const TEAM_MEMBERS = [
-      { memberNumber: 1, name: 'Abhinav K Anand', domain: 'Mechanical (SAMBED)', instagram: 'https://www.instagram.com/abhi_tboat', linkedin: 'https://in.linkedin.com/in/abhinav-k-anand-bb277937a', image: 'assets/team/member-1.jpeg' },
+      { memberNumber: 1, name: 'Abhinav K Anand', domain: 'Mechanical (SAMBED)', instagram: 'https://www.instagram.com/abhi_tboat', linkedin: 'https://in.linkedin.com/in/abhinav-k-anand-bb277937a', image: 'assets/team/member-1.jpeg', zoom: 2.6, originY: 54 },
       { memberNumber: 2, name: 'Team Member 2', domain: 'Domain', instagram: 'https://www.instagram.com/', linkedin: 'https://www.linkedin.com/', image: '' },
       { memberNumber: 3, name: 'Team Member 3', domain: 'Domain', instagram: 'https://www.instagram.com/', linkedin: 'https://www.linkedin.com/', image: '' },
       { memberNumber: 4, name: 'Team Member 4', domain: 'Domain', instagram: 'https://www.instagram.com/', linkedin: 'https://www.linkedin.com/', image: '' },
@@ -136,7 +136,8 @@
 
     const teamGrid = document.getElementById('teamGrid');
     TEAM_MEMBERS.forEach(m => {
-      const photo = m.image ? `<img src="${m.image}" alt="${m.name}">` : String(m.memberNumber).padStart(2, '0');
+      // optional per-member crop: zoom (1 = no zoom) and originY (0-100, the point held steady while zooming)
+      const imgStyle = m.zoom ? ` style="transform:scale(${m.zoom});transform-origin:center ${m.originY ?? 50}%"` : '';
       const card = document.createElement('article');
       card.className = 'flip-card';
       card.tabIndex = 0;
@@ -145,7 +146,7 @@
       card.innerHTML = `
         <div class="flip-inner">
           <div class="flip-face flip-front">
-            <div class="member-photo">${photo}</div>
+            <div class="member-photo">${m.image ? `<img src="${m.image}" alt="${m.name}"${imgStyle}>` : String(m.memberNumber).padStart(2, '0')}</div>
             <h3>${m.name}</h3>
             <p>${m.domain}</p>
           </div>
