@@ -127,12 +127,20 @@
       { memberNumber: 9, name: 'Team Member 9', domain: 'Domain', instagram: 'https://www.instagram.com/', linkedin: 'https://www.linkedin.com/', image: '' }
     ];
 
+    // Single-open state for touch/keyboard: only one card flipped at a time. Desktop hover flip is CSS-only and unaffected.
+    let activeMember = null;
+    const setActive = n => {
+      activeMember = activeMember === n ? null : n;
+      document.querySelectorAll('.flip-card').forEach(c => c.classList.toggle('flipped', Number(c.dataset.member) === activeMember));
+    };
+
     const teamGrid = document.getElementById('teamGrid');
     TEAM_MEMBERS.forEach(m => {
       const photo = m.image ? `<img src="${m.image}" alt="${m.name}">` : String(m.memberNumber).padStart(2, '0');
       const card = document.createElement('article');
       card.className = 'flip-card';
       card.tabIndex = 0;
+      card.dataset.member = m.memberNumber;
       card.setAttribute('aria-label', `${m.name} — activate to flip`);
       card.innerHTML = `
         <div class="flip-inner">
@@ -150,13 +158,12 @@
           </div>
         </div>`;
       teamGrid.appendChild(card);
-      const flip = () => card.classList.toggle('flipped');
       card.addEventListener('click', e => {
         if (e.target.closest('.social-btn')) return;
-        if (!window.matchMedia('(hover: hover)').matches) flip();
+        if (!window.matchMedia('(hover: hover)').matches) setActive(m.memberNumber);
       });
       card.addEventListener('keydown', e => {
-        if ((e.key === 'Enter' || e.key === ' ') && !e.target.closest('.social-btn')) { e.preventDefault(); flip(); }
+        if ((e.key === 'Enter' || e.key === ' ') && !e.target.closest('.social-btn')) { e.preventDefault(); setActive(m.memberNumber); }
       });
     });
 
