@@ -9,26 +9,6 @@
     @import url('https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Space+Grotesk:wght@400;500;600;700&display=swap');
     :root { --bg:#f4f6f0; --surface:#ffffff; --ink:#15231f; --muted:#5e6e68; --line:#d7ded8; --accent:#b8f33d; --accent-ink:#11200d; --deep:#173e35; --shadow:0 20px 60px rgba(25,55,45,.12); }
     [data-theme="dark"] { --bg:#101b19; --surface:#172522; --ink:#eef7ed; --muted:#a9bdb5; --line:#30453e; --accent:#c4ff43; --accent-ink:#14200e; --deep:#bde77f; --shadow:0 20px 60px rgba(0,0,0,.28); }
-    /* color palettes — override accent + tint vars in both light and dark modes */
-    [data-palette="terminal"] { --accent:#3fb950; --accent-ink:#0d1117; --deep:#2ea043; }
-    [data-palette="terminal"][data-theme="dark"] { --accent:#39d353; --deep:#7ee787; }
-    [data-palette="blueprint"] { --accent:#4cc9f0; --accent-ink:#06283d; --deep:#1b4965; --bg:#eef4f8; }
-    [data-palette="blueprint"][data-theme="dark"] { --bg:#0a192f; --deep:#90e0ef; }
-    [data-palette="sunset"] { --accent:#ff8c42; --accent-ink:#2b1608; --deep:#c1502e; --bg:#faf3ec; }
-    [data-palette="sunset"][data-theme="dark"] { --bg:#1c1310; --deep:#ffb07c; }
-    [data-palette="violet"] { --accent:#b388ff; --accent-ink:#1e1233; --deep:#5a189a; --bg:#f4f1fa; }
-    [data-palette="violet"][data-theme="dark"] { --bg:#151021; --deep:#d0bfff; }
-    [data-palette="marvel"] { --bg:#f8f4f2; --surface:#ffffff; --ink:#1c1014; --muted:#6f5a5f; --line:#e6d5d7; --accent:#e62429; --accent-ink:#ffffff; --deep:#9b1017; --shadow:0 20px 60px rgba(120,15,25,.14); }
-    [data-palette="marvel"][data-theme="dark"] { --bg:#0c080a; --surface:#170f12; --ink:#f7eeef; --muted:#b39da2; --line:#362329; --accent:#ff2d3f; --accent-ink:#ffffff; --deep:#ff9aa2; --shadow:0 20px 60px rgba(0,0,0,.4); }
-    [data-palette="marvel"] .orb { background:radial-gradient(circle at 35% 25%,#ffe3da 0 5%,#ff3d47 20%,#a3121e 54%,#3d060b 78%); box-shadow:inset -28px -22px 55px rgba(0,0,0,.25),18px 22px 0 rgba(230,36,41,.22); }
-    [data-palette="marvel"] .orbit { border-color:rgba(155,16,23,.55); }
-    [data-palette="marvel"] .orbit i { border-color:var(--bg); }
-    [data-palette="marvel"] .avatar { background:linear-gradient(135deg,var(--accent),#7a0d14); }
-    [data-palette="marvel"] .model-card { background:radial-gradient(circle at 50% 35%,#a3121e 0 10%,#5c0a12 35%,#240509 75%); border-color:#7a1520; }
-    [data-palette="marvel"] .model-card:before { color:#ff5a64; }
-    [data-palette="marvel"] .wire { border-color:rgba(255,90,100,.4); box-shadow:0 0 50px rgba(230,36,41,.15); }
-    [data-palette="marvel"] .model-core { background:linear-gradient(145deg,#ffb3a8,#e62429 48%,#5c0a12); box-shadow:inset -18px -15px 25px rgba(0,0,0,.3),0 0 60px rgba(230,36,41,.35); }
-    [data-palette="marvel"] .member-overlay { background:linear-gradient(to top,rgba(26,4,8,.82),rgba(26,4,8,0)); }
     * { box-sizing:border-box; }
     html { scroll-behavior:smooth; }
     body { margin:0; background:var(--bg); color:var(--ink); font-family:'Space Grotesk',sans-serif; line-height:1.55; transition:background .3s,color .3s; }
@@ -43,8 +23,6 @@
     nav a:hover { color:var(--ink); }
     .theme { border:1px solid var(--line); color:var(--ink); background:var(--surface); border-radius:999px; padding:9px 13px; cursor:pointer; font:500 .78rem 'Space Grotesk'; display:flex; gap:7px; align-items:center; }
     .theme-dot { width:10px; height:10px; border-radius:50%; background:var(--accent); }
-    .palette { border:1px solid var(--line); color:var(--ink); background:var(--surface); border-radius:999px; padding:8px 12px; cursor:pointer; font:500 .78rem 'Space Grotesk'; display:flex; gap:7px; align-items:center; }
-    .palette option { color:#15231f; }
     .hamburger { display:none; width:42px; height:42px; border:1px solid var(--line); background:var(--surface); border-radius:12px; cursor:pointer; flex-direction:column; align-items:center; justify-content:center; padding:0; flex-shrink:0; }
     .hamburger span { display:block; width:18px; height:2px; background:var(--ink); margin:2px 0; transition:transform .25s, opacity .25s; }
     header.nav-open .hamburger span:nth-child(1) { transform:translateY(6px) rotate(45deg); }
@@ -122,7 +100,7 @@
   </style>
 </head>
 <body>
-  <header><div class="wrap nav"><a class="brand" href="#home"><span class="mark">↗</span>interdomain</a><nav id="navMenu"><a href="#home">Home</a><a href="#model">3-D model</a><a href="#components">Components</a><a href="#solution">Problem &amp; solution</a><a href="#team">Team</a><a href="#gallery">Gallery</a><button class="theme" id="themeToggle" type="button"><span class="theme-dot"></span><span id="themeLabel">Dark mode</span></button><label class="palette" aria-label="Color theme"><span class="theme-dot" aria-hidden="true"></span><select id="paletteSelect" style="border:none;background:transparent;color:inherit;font:inherit;cursor:pointer" aria-label="Color theme"><option value="sage">Sage</option><option value="terminal">Terminal</option><option value="blueprint">Blueprint</option><option value="sunset">Sunset</option><option value="violet">Violet</option><option value="marvel">Marvel</option></select></label></nav><button class="hamburger" id="navToggle" type="button" aria-expanded="false" aria-controls="navMenu" aria-label="Open menu"><span></span><span></span><span></span></button></div></header>
+  <header><div class="wrap nav"><a class="brand" href="#home"><span class="mark">↗</span>interdomain</a><nav id="navMenu"><a href="#home">Home</a><a href="#model">3-D model</a><a href="#components">Components</a><a href="#solution">Problem &amp; solution</a><a href="#team">Team</a><a href="#gallery">Gallery</a><button class="theme" id="themeToggle" type="button"><span class="theme-dot"></span><span id="themeLabel">Dark mode</span></button></nav><button class="hamburger" id="navToggle" type="button" aria-expanded="false" aria-controls="navMenu" aria-label="Open menu"><span></span><span></span><span></span></button></div></header>
   <main>
     <section class="wrap hero" id="home"><div><div class="eyebrow">Automated robotic system / 2026</div><h1>PAPR <em>— Pick and Place Robot.</em></h1><p>The Pick and Place Robot (PAPR) is an automated robotic system, which identifies, classifies, picks, and sorts objects into their respective designated locations. The system makes use of computer vision to analyze the shape, structure, and position of incoming objects and make decisions regarding their identification, and placement.</p><div class="actions"><a class="button alt" href="#solution">Read our approach</a></div></div><div class="hero-art"><div class="orbit"><i></i></div><div class="orb"></div></div></section>
     <section class="wrap" id="model"><div class="section-head"><div><div class="eyebrow">01 / 3-D model</div><h2>One system.<br/>Many vantage points.</h2></div><p>Rotate your perspective. The core is the same, but every domain reveals a different edge of the story.</p></div><div class="model-shell"><div class="model-card"><div class="wire"></div><div class="wire"></div><div class="wire"></div><div class="model-core"></div><div class="model-label">LIVE ORBIT / CONNECTED VIEW</div></div><div class="model-copy"><h3>The Interdomain core</h3><p>A conceptual 3-D model of the relationships our project maps: shared context at the centre, with distinct disciplines orbiting around it.</p><div class="stat"><span>Dimensions</span><b>3 × 3 × 3</b></div><div class="stat"><span>Connected nodes</span><b>08 active</b></div><div class="stat"><span>View mode</span><b>Exploratory</b></div><a class="button" href="#gallery" style="margin-top:22px">See visual studies <span>↘</span></a></div></div></section>
@@ -138,11 +116,6 @@
     const update = () => { const dark = root.dataset.theme === 'dark'; label.textContent = dark ? 'Light mode' : 'Dark mode'; toggle.setAttribute('aria-label', dark ? 'Switch to light theme' : 'Switch to dark theme'); };
     toggle.addEventListener('click', () => { root.dataset.theme = root.dataset.theme === 'dark' ? 'light' : 'dark'; localStorage.setItem('interdomain-theme', root.dataset.theme); update(); }); update();
 
-    // ---- Color palette themes (independent of light/dark mode) ----
-    const paletteSelect = document.getElementById('paletteSelect');
-    const savedPalette = localStorage.getItem('interdomain-palette') || 'marvel'; if (savedPalette) { root.dataset.palette = savedPalette; paletteSelect.value = savedPalette; }
-    paletteSelect.addEventListener('change', () => { root.dataset.palette = paletteSelect.value; localStorage.setItem('interdomain-palette', paletteSelect.value); });
-
     // ---- Team members 1-9: edit ONLY this data to fill a slot (card design is untouched) ----
     // image: '' shows a numbered placeholder; a URL/path shows the photo (cropped with object-fit, never stretched).
     const TEAM_MEMBERS = [
@@ -152,7 +125,7 @@
       { memberNumber: 4, name: 'Sairav Kharga', domain: 'Spaced (Coding)', instagram: 'https://www.instagram.com/skhrg__', linkedin: 'https://www.linkedin.com/in/sairav-kharga-9a7aa7428', image: 'assets/team/member-4.png', objectPosition: 'center 33%' },
       { memberNumber: 5, name: 'Debangshu Banik', domain: 'Spaced (Coding)', instagram: 'https://www.instagram.com/debangshu_banik/', linkedin: 'https://www.linkedin.com/in/debangshu-banik-784603280', image: 'assets/team/member-5.png' },
       { memberNumber: 6, name: 'Devi Jahnavi', domain: 'Siesed', instagram: 'https://www.instagram.com/jahnavi._.9', linkedin: 'https://www.linkedin.com/in/devi-jahnavi-914580426', image: 'assets/team/member-6.jpeg' },
-      { memberNumber: 7, name: 'Team Member 7', domain: 'Domain', instagram: 'https://www.instagram.com/', linkedin: 'https://www.linkedin.com/', image: '' },
+      { memberNumber: 7, name: 'Mathew', domain: 'Siesed', instagram: 'https://www.instagram.com/john_mathew_1707_', linkedin: '', image: 'assets/team/member-7.jpeg' },
       { memberNumber: 8, name: 'Team Member 8', domain: 'Domain', instagram: 'https://www.instagram.com/', linkedin: 'https://www.linkedin.com/', image: '' },
       { memberNumber: 9, name: 'Team Member 9', domain: 'Domain', instagram: 'https://www.instagram.com/', linkedin: 'https://www.linkedin.com/', image: '' }
     ];
@@ -182,8 +155,8 @@
           <div class="flip-face flip-back">
             <h3>${m.name}</h3>
             <div class="socials">
-              <a class="social-btn" href="${m.instagram}" target="_blank" rel="noopener" aria-label="${m.name} on Instagram">Instagram ↗</a>
-              <a class="social-btn alt" href="${m.linkedin}" target="_blank" rel="noopener" aria-label="${m.name} on LinkedIn">LinkedIn ↗</a>
+              ${m.instagram ? `<a class="social-btn" href="${m.instagram}" target="_blank" rel="noopener" aria-label="${m.name} on Instagram">Instagram ↗</a>` : ''}
+              ${m.linkedin ? `<a class="social-btn alt" href="${m.linkedin}" target="_blank" rel="noopener" aria-label="${m.name} on LinkedIn">LinkedIn ↗</a>` : ''}
             </div>
           </div>
         </div>`;
