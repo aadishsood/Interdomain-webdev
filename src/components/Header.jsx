@@ -22,9 +22,9 @@ export default function Header({ theme, onToggleTheme }) {
         <a className="brand" href="#home">PAPRDOM</a>
         <nav id="navMenu">
           {NAV_LINKS.map(l => <a key={l.href} href={l.href} onClick={close}>{l.label}</a>)}
-          <button className="theme" type="button" onClick={onToggleTheme} aria-label={dark ? 'Switch to light theme' : 'Switch to dark theme'}>
+          <button className="theme theme-icon" type="button" onClick={onToggleTheme} aria-label={dark ? 'Switch to light theme' : 'Switch to dark theme'} title={dark ? 'Light mode' : 'Dark mode'}>
             <span className="theme-dot"></span>
-            <span>{dark ? 'Light mode' : 'Dark mode'}</span>
+            <span className="theme-glyph" aria-hidden="true">{dark ? '☀' : '☾'}</span>
           </button>
         </nav>
         <button

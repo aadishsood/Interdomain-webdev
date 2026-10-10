@@ -106,10 +106,9 @@ void main() {
   }
 }`
 
-const PALETTES = {
-  dark: ['#0a1f2f', '#1e70bf', '#06b6d4'],
-  light: ['#eef3f6', '#2d5a7f', '#1d8aa3']
-}
+// Frost color scheme from reactbits.dev/backgrounds/molten-metal
+// (?color1=0a1f2f&color2=1e70bf&color3=06b6d4&colorMode=frost) — used for both themes.
+const PALETTE = ['#0a1f2f', '#1e70bf', '#06b6d4']
 const hex = h => [1, 3, 5].map(i => parseInt(h.slice(i, i + 2), 16) / 255)
 
 export default function MoltenBackground({ theme }) {
@@ -138,8 +137,7 @@ export default function MoltenBackground({ theme }) {
     gl.uniform1f(u.uSpeed, 0.35); gl.uniform1f(u.uScale, 4); gl.uniform1f(u.uDetail, 3); gl.uniform1f(u.uGlow, 1.6); gl.uniform1f(u.uCoreSize, 0.1); gl.uniform1f(u.uSwirl, 1); gl.uniform1f(u.uFold, -0.2); gl.uniform1f(u.uBlackPoint, 0.05); gl.uniform1f(u.uBrightness, 1.3); gl.uniform1f(u.uColorMode, 2); gl.uniform1f(u.uGrain, 1); gl.uniform1f(u.uGrainIntensity, 0.05); gl.uniform1f(u.uOpacity, 1.0); gl.uniform1f(u.uMouseStrength, 0.3); gl.uniform1i(u.uEnableMouse, 1); gl.uniform1f(u.uLightMode, 0); gl.uniform3f(u.uBackgroundColor, 1, 1, 1)
 
     paletteRef.current = () => {
-      const p = PALETTES[document.documentElement.dataset.theme === 'dark' ? 'dark' : 'light']
-      gl.uniform3fv(u.uColor1, hex(p[0])); gl.uniform3fv(u.uColor2, hex(p[1])); gl.uniform3fv(u.uColor3, hex(p[2]))
+      gl.uniform3fv(u.uColor1, hex(PALETTE[0])); gl.uniform3fv(u.uColor2, hex(PALETTE[1])); gl.uniform3fv(u.uColor3, hex(PALETTE[2]))
     }
     paletteRef.current()
 

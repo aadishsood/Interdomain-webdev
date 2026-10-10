@@ -37,7 +37,6 @@ function MemberCard({ member, active, onActivate }) {
       <div className="flip-inner">
         <div className={`flip-face flip-front${image ? '' : ' fallback'}`}>{frontMedia}</div>
         <div className="flip-face flip-back">
-          <h3>{name}</h3>
           <div className="socials">
             {instagram && <a className="social-btn" href={instagram} target="_blank" rel="noopener" aria-label={`${name} on Instagram`}>Instagram ↗</a>}
             {linkedin && <a className="social-btn alt" href={linkedin} target="_blank" rel="noopener" aria-label={`${name} on LinkedIn`}>LinkedIn ↗</a>}
