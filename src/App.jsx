@@ -32,7 +32,7 @@ export default function App() {
       <Header theme={theme} onToggleTheme={toggleTheme} />
       <main>
         <Hero />
-        <ModelSection />
+        <ModelSection theme={theme} />
         <ComponentsSection />
         <SolutionSection />
         <TeamSection />
