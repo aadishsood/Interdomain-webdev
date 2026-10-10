@@ -1,0 +1,12 @@
+{
+  "files.associations": {
+    "*.html": "html"
+  },
+  "editor.formatOnSave": true,
+  "editor.defaultFormatter": "vscode.html-language-features",
+  "liveServer.settings.port": 5500,
+  "liveServer.settings.wait": 300,
+  "emmet.includeLanguages": {
+    "html": "html"
+  }
+}
