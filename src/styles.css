@@ -226,7 +226,15 @@ footer { border-top:1px solid var(--line); padding:52px 0 40px; }
   .components-grid { grid-template-columns:1fr; }
   .papr-control-ribbon { flex-direction:column; align-items:flex-start; }
   .papr-canvas-overlay { padding:14px; }
-  .papr-hud-card { max-width:100%; }
+  .papr-hud-card { 
+    max-width:100%; 
+    position:relative;
+    top: auto;
+    right: auto;
+    bottom: auto;
+    left: auto;
+    margin: 12px auto;
+  }
   .papr-components-filter { display:none; }
   .papr-viewport-container { height:440px; }
   .papr-math-header { flex-direction:column; align-items:flex-start; }
