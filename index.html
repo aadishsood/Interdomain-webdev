@@ -1,0 +1,346 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="description" content="PAPR is an autonomous pick-and-place robot by PAPRDOM — using computer vision to identify, classify, and sort objects with precision. Built by a cross-disciplinary student team." />
+  <title>PAPR by PAPRDOM — Autonomous Pick & Place Robot</title>
+  <link rel="icon" type="image/png" href="/assets/favicon.png" />
+  <link rel="apple-touch-icon" href="/assets/favicon.png" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Unbounded:wght@200..900&display=swap" />
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Unbounded:wght@200..900&display=swap" media="print" onload="this.media='all'" />
+  <noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Unbounded:wght@200..900&display=swap" /></noscript>
+  <link rel="stylesheet" href="/src/css/main.css" />
+
+  <!-- Open Graph / Social -->
+  <meta property="og:type" content="website" />
+  <meta property="og:title" content="PAPR by PAPRDOM — Autonomous Pick & Place Robot" />
+  <meta property="og:description" content="Computer vision-powered robot that identifies, classifies, and sorts objects with precision. Built by team PAPRDOM." />
+  <meta property="og:url" content="https://interdomain-webdev.vercel.app/" />
+  <meta property="og:image" content="/assets/og-image.png" />
+  <meta property="og:image:width" content="1200" />
+  <meta property="og:image:height" content="630" />
+
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:title" content="PAPR by PAPRDOM — Autonomous Pick & Place Robot" />
+  <meta name="twitter:description" content="Computer vision-powered robot that identifies, classifies, and sorts objects with precision." />
+  <meta name="twitter:image" content="/assets/og-image.png" />
+
+  <!-- JSON-LD Structured Data -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "Project",
+    "name": "PAPR",
+    "alternateName": "Pick and Place Robot",
+    "description": "An autonomous pick-and-place robot using computer vision for object identification, classification, and sorting.",
+    "url": "https://interdomain-webdev.vercel.app/",
+    "logo": "https://interdomain-webdev.vercel.app/assets/favicon.png",
+    "image": "https://interdomain-webdev.vercel.app/assets/og-image.png",
+    "creator": {
+      "@type": "Organization",
+      "name": "PAPRDOM",
+      "url": "https://interdomain-webdev.vercel.app/",
+      "description": "Student robotics team building connected automation systems."
+    },
+    "keywords": ["robotics", "pick and place", "computer vision", "automation", "student project"],
+    "category": "Robotics"
+  }
+  </script>
+</head>
+<body>
+  <a href="#main" class="skip-link">Skip to main content</a>
+
+  <header class="site-header">
+    <div class="wrap nav">
+      <a class="brand" href="#home" aria-label="PAPRDOM home">
+        <svg class="brand-mark" viewBox="0 0 32 32" aria-hidden="true" focusable="false">
+          <circle cx="16" cy="16" r="14" fill="currentColor" />
+          <path d="M10 16 L14 20 L22 12" stroke="var(--accent-ink)" stroke-width="3" fill="none" stroke-linecap="round" stroke-linejoin="round" />
+        </svg>
+        <span class="brand-text">PAPRDOM</span>
+      </a>
+      <nav id="navMenu" class="nav-links" aria-label="Main navigation">
+        <a href="#home">Home</a>
+        <a href="#model">PAPR 3D Model</a>
+        <a href="#components">PAPR Components</a>
+        <a href="#solution">Our Approach</a>
+        <a href="#team">Team PAPRDOM</a>
+        <a href="#gallery">Gallery</a>
+        <button class="theme-toggle" id="themeToggle" type="button" aria-label="Switch to dark theme" aria-pressed="false">
+          <span class="theme-dot" aria-hidden="true"></span>
+          <span id="themeLabel">Dark mode</span>
+        </button>
+      </nav>
+      <button class="hamburger" id="navToggle" type="button" aria-expanded="false" aria-controls="navMenu" aria-label="Open menu">
+        <span aria-hidden="true"></span>
+        <span aria-hidden="true"></span>
+        <span aria-hidden="true"></span>
+      </button>
+    </div>
+  </header>
+
+  <main id="main">
+    <section class="wrap hero" id="home" aria-labelledby="hero-title">
+      <div class="hero-content">
+        <div class="hero-brand">
+          <span class="team-badge">PAPRDOM</span>
+          <h1 id="hero-title">PAPR <em>— Autonomous Pick & Place Robot</em></h1>
+        </div>
+        <p class="hero-desc">Computer vision-powered automation for precise object identification, classification, and sorting. PAPR analyzes shape, structure, and position of incoming objects in real-time to make intelligent pick-and-place decisions.</p>
+        <div class="actions">
+          <a class="button alt" href="#solution">Read Our Approach</a>
+          <a class="button" href="#components">Explore Components <span aria-hidden="true">→</span></a>
+        </div>
+        <div class="hero-stats" aria-label="Key specifications">
+          <div class="stat-item">
+            <span class="stat-value">6</span>
+            <span class="stat-label">DOF Arm</span>
+          </div>
+          <div class="stat-item">
+            <span class="stat-value"><50ms</span>
+            <span class="stat-label">Vision Latency</span>
+          </div>
+          <div class="stat-item">
+            <span class="stat-value">2kg</span>
+            <span class="stat-label">Max Payload</span>
+          </div>
+        </div>
+      </div>
+      <div class="hero-art" aria-hidden="true">
+        <div class="orbit" aria-hidden="true"><i aria-hidden="true"></i></div>
+        <div class="orb" aria-hidden="true"></div>
+      </div>
+    </section>
+
+    <section class="wrap" id="model" aria-labelledby="model-title">
+      <div class="section-head">
+        <div>
+          <h2 id="model-title">PAPR in <br/>Three Dimensions</h2>
+        </div>
+        <p>Interactive conceptual model of the PAPR system architecture — shared context at the centre, with distinct subsystems orbiting around it.</p>
+      </div>
+      <div class="model-shell">
+        <div class="model-card" role="img" aria-label="PAPR 3D conceptual model showing core controller with vision, arm, gripper, conveyor, and sensor subsystems orbiting around it">
+          <div class="wire" aria-hidden="true"></div>
+          <div class="wire" aria-hidden="true"></div>
+          <div class="wire" aria-hidden="true"></div>
+          <div class="model-core" aria-hidden="true"></div>
+          <div class="orbit-labels" aria-hidden="true">
+            <span class="orbit-label" style="--angle: -45deg; --dist: 140%;">Vision</span>
+            <span class="orbit-label" style="--angle: 15deg; --dist: 140%;">Arm</span>
+            <span class="orbit-label" style="--angle: 75deg; --dist: 140%;">Gripper</span>
+            <span class="orbit-label" style="--angle: 135deg; --dist: 140%;">Conveyor</span>
+            <span class="orbit-label" style="--angle: -105deg; --dist: 140%;">Sensors</span>
+            <span class="orbit-label" style="--angle: 165deg; --dist: 140%;">Controller</span>
+          </div>
+        </div>
+        <div class="model-copy">
+          <h3>The PAPR Core Architecture</h3>
+          <p>A modular 3-D representation of the PAPR system: the central controller coordinates six subsystems through a shared state bus, enabling real-time closed-loop control from vision to placement.</p>
+          <div class="stat"><span>Subsystems</span><b>6 Active</b></div>
+          <div class="stat"><span>Control Loop</span><b>200 Hz</b></div>
+          <div class="stat"><span>Coordination</span><b>Event-Driven</b></div>
+          <a class="button" href="#components" style="margin-top:22px">Explore Subsystems <span aria-hidden="true">→</span></a>
+        </div>
+      </div>
+    </section>
+
+    <section class="wrap" id="components" aria-labelledby="components-title">
+      <div class="section-head">
+        <div>
+          <h2 id="components-title">Inside the<br/>System</h2>
+        </div>
+        <p>Every module of PAPR, from seeing to gripping, works as one connected pipeline.</p>
+      </div>
+      <div class="components-grid" role="list" aria-label="PAPR system components">
+        <article class="component-card" role="listitem">
+          <div class="component-icon" aria-hidden="true">01</div>
+          <div class="component-info">
+            <h3>Camera & Vision</h3>
+            <p>High-frame-rate camera captures live views for real-time shape, structure, and position analysis using custom CNN inference.</p>
+            <ul class="component-specs">
+              <li>120 FPS global shutter</li>
+              <li>640×480 ROI processing</li>
+              <li>ONNX Runtime inference</li>
+            </ul>
+          </div>
+        </article>
+        <article class="component-card" role="listitem">
+          <div class="component-icon" aria-hidden="true">02</div>
+          <div class="component-info">
+            <h3>Sensors</h3>
+            <p>Multi-modal sensing for object presence detection and fine position feedback along the pick and place trajectory.</p>
+            <ul class="component-specs">
+              <li>Time-of-flight proximity</li>
+              <li>Force/torque at wrist</li>
+              <li>Encoder feedback per joint</li>
+            </ul>
+          </div>
+        </article>
+        <article class="component-card" role="listitem">
+          <div class="component-icon" aria-hidden="true">03</div>
+          <div class="component-info">
+            <h3>Robotic Arm</h3>
+            <p>6-DOF articulated arm with harmonic drives for precise, repeatable motion in confined workspaces.</p>
+            <ul class="component-specs">
+              <li>Reach: 850 mm</li>
+              <li>Repeatability: ±0.05 mm</li>
+              <li>Max speed: 3 m/s TCP</li>
+            </ul>
+          </div>
+        </article>
+        <article class="component-card" role="listitem">
+          <div class="component-icon" aria-hidden="true">04</div>
+          <div class="component-info">
+            <h3>Adaptive Gripper</h3>
+            <p>Underactuated 3-finger gripper with compliant joints that auto-adapts to object geometry without explicit grasp planning.</p>
+            <ul class="component-specs">
+              <li>Stroke: 40 mm per finger</li>
+              <li>Grasp force: 0.5–15 N</li>
+              <li>Tactile pads on fingertips</li>
+            </ul>
+          </div>
+        </article>
+        <article class="component-card" role="listitem">
+          <div class="component-icon" aria-hidden="true">05</div>
+          <div class="component-info">
+            <h3>Conveyor System</h3>
+            <p>Synchronized belt conveyor with encoder feedback for precise object presentation to vision and pick zones.</p>
+            <ul class="component-specs">
+              <li>Speed: 0–500 mm/s</li>
+              <li>Position accuracy: ±1 mm</li>
+              <li>Zone-triggered indexing</li>
+            </ul>
+          </div>
+        </article>
+        <article class="component-card" role="listitem">
+          <div class="component-icon" aria-hidden="true">06</div>
+          <div class="component-info">
+            <h3>Central Controller</h3>
+            <p>Real-time Linux controller running ROS 2, coordinating vision inference, trajectory planning, and motion execution.</p>
+            <ul class="component-specs">
+              <li>Intel NUC i7 / RPi 5</li>
+              <li>ROS 2 Humble / RT kernel</li>
+              <li>EtherCAT for I/O</li>
+            </ul>
+          </div>
+        </article>
+      </div>
+    </section>
+
+    <section class="wrap" id="solution" aria-labelledby="solution-title">
+      <div class="section-head">
+        <div>
+          <h2 id="solution-title">Complexity is<br/>a Design Brief</h2>
+        </div>
+        <p>We start by naming the friction in robotic automation, then turn it into a system operators can navigate with confidence.</p>
+      </div>
+      <div class="problem">
+        <p class="big-note">When perception, planning, and control work in isolation, critical signals get lost in translation. PAPR makes the invisible handoffs visible.</p>
+        <div class="solution-list" role="list" aria-label="PAPR design approach">
+          <div class="solution" role="listitem">
+            <div class="solution-no">01</div>
+            <div>
+              <h3>Unify Perception & Action</h3>
+              <p>Shared state bus connects vision output directly to motion planner — no intermediate serialization, no latency-inducing middleware.</p>
+            </div>
+          </div>
+          <div class="solution" role="listitem">
+            <div class="solution-no">02</div>
+            <div>
+              <h3>Close the Loop at 200 Hz</h3>
+              <p>Force/torque and vision feedback fused in real-time controller enables reactive adjustment during grasp and place phases.</p>
+            </div>
+          </div>
+          <div class="solution" role="listitem">
+            <div class="solution-no">03</div>
+            <div>
+              <h3>Design for Changeover</h3>
+              <p>Modular gripper fingers, swappable vision models, and parameterized trajectories enable < 5 min product changeover.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="wrap" id="team" aria-labelledby="team-title">
+      <div class="section-head">
+        <div>
+          <h2 id="team-title">The People<br/>Behind PAPR</h2>
+        </div>
+        <p>A cross-functional student team with a shared belief: better connections make better robots.</p>
+      </div>
+      <div class="team-grid" id="teamGrid" role="list" aria-label="PAPRDOM team members"></div>
+    </section>
+
+    <section class="wrap" id="gallery" aria-labelledby="gallery-title">
+      <div class="section-head">
+        <div>
+          <h2 id="gallery-title">Fragments of<br/>the Process</h2>
+        </div>
+        <p>Field notes, visual experiments, and the in-between moments that shaped the final system.</p>
+      </div>
+      <div class="gallery" role="list" aria-label="Project gallery">
+        <article class="tile" role="listitem" style="background-image: url('/assets/gallery/core-001.jpg');">
+          <span>Core / 001 — Orbit Study</span>
+        </article>
+        <article class="tile" role="listitem" style="background-image: url('/assets/gallery/material-014.jpg');">
+          <span>Material / 014 — Warm Signal</span>
+        </article>
+        <article class="tile" role="listitem" style="background-image: url('/assets/gallery/field-022.jpg');">
+          <span>Field / 022 — Blue Hour</span>
+        </article>
+        <article class="tile" role="listitem" style="background-image: url('/assets/gallery/proto-008.jpg');">
+          <span>Prototype / 008 — New Paths</span>
+        </article>
+        <article class="tile" role="listitem" style="background-image: url('/assets/gallery/archive-031.jpg');">
+          <span>Archive / 031 — Soft Edges</span>
+        </article>
+        <article class="tile" role="listitem" style="background-image: url('/assets/gallery/notes-005.jpg');">
+          <span>Notes / 005 — Move Together</span>
+        </article>
+      </div>
+    </section>
+
+    <section class="wrap cta-section" id="contact" aria-labelledby="contact-title">
+      <h2 id="contact-title" class="visually-hidden">Get in Touch</h2>
+      <div class="cta-card">
+        <h3>Want to Collaborate or Learn More?</h3>
+        <p>We're always looking for industry partners, research collaborators, and talented engineers to join PAPRDOM.</p>
+        <div class="cta-actions">
+          <a class="button" href="mailto:team@paprdom.dev">Email Us</a>
+          <a class="button alt" href="https://github.com/paprdom" target="_blank" rel="noopener">GitHub <span aria-hidden="true">↗</span></a>
+          <a class="button alt" href="https://linkedin.com/company/paprdom" target="_blank" rel="noopener">LinkedIn <span aria-hidden="true">↗</span></a>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="wrap" role="contentinfo">
+    <div class="footer-grid">
+      <div>
+        <h3 class="footer-brand">PAPRDOM</h3>
+        <p class="footer-desc"><strong>PAPRDOM</strong> is the student robotics team behind <strong>PAPR</strong> — an autonomous pick & place robot that uses computer vision to identify, classify, and sort objects. We build connected automation systems.</p>
+      </div>
+      <nav class="footer-links" aria-label="Footer navigation">
+        <a href="#home">Home</a>
+        <a href="#model">PAPR 3D Model</a>
+        <a href="#components">Components</a>
+        <a href="#solution">Our Approach</a>
+        <a href="#team">Team</a>
+        <a href="#gallery">Gallery</a>
+        <a href="#contact">Contact</a>
+      </nav>
+    </div>
+    <div class="footer-bottom">
+      <p>&copy; 2026 PAPRDOM. All rights reserved.</p>
+      <p>Built with care by the team. <a href="https://github.com/paprdom/paprdom-website" target="_blank" rel="noopener">View source</a></p>
+    </div>
+  </footer>
+
+  <script type="module" src="/src/js/main.js"></script>
+</body>
+</html>
