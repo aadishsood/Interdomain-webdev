@@ -2,55 +2,63 @@ import { useEffect, useRef, useState } from 'react'
 import * as THREE from 'three'
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js'
 
-// Operational phases of the Pick and Place sequence
+// 7-Step Pick and Place Sequence based on user specification and technical documentation
 export const STAGES = [
   {
-    id: 'standby',
-    label: '01. Calibrated Standby',
+    id: 'move',
+    label: '1. Move to Object',
     time: 0.0,
-    heading: 'Kinematic Ready Posture',
-    desc: 'The PAPR arm maintains home ready posture above the dual-tier workbench. MG996R and MG90S servo motors are energized and holding torque at calibrated neutral offsets.',
-    specs: { 'Base Yaw': '0° (Center)', 'Shoulder': '28°', 'Elbow': '-38°', 'Gripper': 'Neutral Ready' }
+    heading: 'Position Directly Above Object',
+    desc: 'RKI 1 (BASE) rotates to -45° while RKI 2 (SHOULDER) and RKI 3 (ELBOW) articulate into position, placing the vertical slide and claw directly above the workpiece.',
+    specs: { 'Base Yaw (RKI 1)': '-45°', 'Shoulder (RKI 2)': '47°', 'Elbow (RKI 3)': '37°', 'Vertical Slide': 'Retracted (Top)' }
   },
   {
-    id: 'reach',
-    label: '02. Kinematic Reach',
-    time: 0.22,
-    heading: 'Target Acquisition & Extension',
-    desc: 'Base turntable sweeps -45° towards Pick Station A. Shoulder and elbow links articulate forward and down, extending the gripper directly over the target workpiece.',
-    specs: { 'Base Yaw': '-45° (Pick)', 'Shoulder': '64°', 'Elbow': '-85°', 'Gripper': 'Open (MG90S 65°)' }
+    id: 'descend',
+    label: '2. Descend to Height',
+    time: 0.18,
+    heading: 'Vertical Slide Downward Extension',
+    desc: 'The vertical arm segment moves downward, bringing the claw from clearance height down to the exact physical height of the target workpiece.',
+    specs: { 'Descent Stroke': '-96 mm', 'Target Height': 'Y = 1.16', 'Claw Jaws': 'Opening (MG90S)', 'Approach': 'Direct Vertical' }
   },
   {
-    id: 'grasp',
-    label: '03. Precision Claw Grasp',
-    time: 0.40,
-    heading: 'Claw Gripper Actuation',
-    desc: 'The MG90S micro-servo drives the parallel claw linkage closed. High-friction jaw pads clamp firmly onto the workpiece with verified contact force.',
-    specs: { 'Grip Force': '12.4 N', 'MG90S Angle': 'Closed (18°)', 'Jaws': 'Clamped 100%', 'Payload': 'Secured' }
+    id: 'grip',
+    label: '3. Open & Grip Object',
+    time: 0.35,
+    heading: 'Claw Clamps Workpiece',
+    desc: 'The claw fingers visibly open before contact, surround the object on the pick station, and close tightly via the MG90S pincer linkage to securely capture the payload.',
+    specs: { 'Claw Status': 'Clamped 100%', 'MG90S Angle': 'Closed (18°)', 'Attachment': 'Physically Locked', 'Payload': 'Secured' }
   },
   {
     id: 'lift',
-    label: '04. High-Torque Vertical Lift',
-    time: 0.60,
-    heading: 'Vertical Lift & Clearance Arc',
-    desc: 'Twin MG996R metal-gear servos deliver peak driving torque to lift the lower arm, forearm, and gripped workpiece vertically clear of the pick fixture.',
-    specs: { 'Lift Height': '+160 mm', 'Driving Torque': '9.8 kg·cm', 'Shoulder': '22°', 'Elbow': '-32°' }
+    label: '4. High-Torque Lift',
+    time: 0.50,
+    heading: 'Vertical Lift with Carried Object',
+    desc: 'The vertical arm segment rises, lifting the claw and clamped workpiece clear of the pick fixture. The object remains securely aligned between the fingers.',
+    specs: { 'Lift Height': '+96 mm', 'Payload Status': 'Locked to Claw', 'Driving Servos': 'MG996R & MG90S', 'Clearance': 'Verified' }
   },
   {
-    id: 'transfer',
-    label: '05. Workspace Transfer',
-    time: 0.80,
-    heading: 'Spatial Transfer to Sorting Point',
-    desc: 'Base yaw sweeps across the working envelope from -45° to +45° towards the sorting receptacle. Wrist pitch compensates continuously to maintain payload stability.',
-    specs: { 'Base Yaw': '+45° (Sort)', 'Path': '3D Arc Trajectory', 'Payload': 'Clamped', 'Clearance': 'High Margin' }
+    id: 'transport',
+    label: '5. Workspace Transport',
+    time: 0.68,
+    heading: 'Spatial Arc Transfer Across Workspace',
+    desc: 'RKI 1 (BASE) sweeps across from -45° to +45° to carry the held workpiece across the 3D workspace to the sorting destination without slipping or floating.',
+    specs: { 'Base Yaw (RKI 1)': '+45° (Sort Target)', 'Transfer Path': 'Smooth S-Curve', 'Payload Stability': 'Maintained', 'Slip Risk': 'Zero' }
   },
   {
     id: 'release',
-    label: '06. Sort & Release',
+    label: '6. Lower & Release',
+    time: 0.85,
+    heading: 'Descent to Destination & Release',
+    desc: 'The claw descends vertically to the sorting point height, opens its jaws to deposit the workpiece into the sorted bin, and then lifts away.',
+    specs: { 'Destination': 'Sorting Station B', 'Descent Stroke': '-96 mm', 'Claw Jaws': 'Open (MG90S 70°)', 'Payload Status': 'Deposited' }
+  },
+  {
+    id: 'repeat',
+    label: '7. Reset & Repeat',
     time: 1.0,
-    heading: 'Placement & Sorting Complete',
-    desc: 'The arm lowers over sorting receptacle B. The MG90S servo opens the claw jaws to release the workpiece into the sorted bin, and the arm preps the next cycle.',
-    specs: { 'Target': 'Sorting Bin B', 'MG90S Angle': 'Open (70°)', 'Status': 'Sorted 100%', 'Next Cycle': 'Armed' }
+    heading: 'Return to Pick Cycle',
+    desc: 'The vertical segment lifts away clear of the sorted payload, the arm returns to the pick location, and preps the next continuous cycle.',
+    specs: { 'Slide Status': 'Ascended', 'Cycle Counter': 'Continuous Loop', 'Controller': 'ESP32 DevKit V1', 'Next Object': 'Ready' }
   }
 ]
 
@@ -60,10 +68,15 @@ export default function PaprRobot3D({ theme = 'light', externalScrollProgress = 
   const animFrameRef = useRef(null)
   const [activeStageIndex, setActiveStageIndex] = useState(0)
   const [progress, setProgress] = useState(0)
-  const [isPlaying, setIsPlaying] = useState(false)
-  const isPlayingRef = useRef(false)
+  const [isPlaying, setIsPlaying] = useState(() => {
+    if (typeof window !== 'undefined' && window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+      return false
+    }
+    return true
+  })
+  const isPlayingRef = useRef(true)
   const [viewMode, setViewMode] = useState('3d') // '3d' | 'cad-overlay'
-  const [liveAngles, setLiveAngles] = useState({ yaw: '0°', shoulder: '28°', elbow: '-38°', claw: 'Ready' })
+  const [telemetry, setTelemetry] = useState({ yaw: '-45°', shoulder: '47°', elbow: '37°', slide: '0 mm', claw: 'Ready' })
 
   // Kinematic joints refs
   const kinematicRefs = useRef({
@@ -71,24 +84,23 @@ export default function PaprRobot3D({ theme = 'light', externalScrollProgress = 
     shoulderJoint: null,
     elbowJoint: null,
     wristJoint: null,
+    verticalSlide: null,
     leftClaw: null,
     rightClaw: null,
     gripAnchor: null,
     payload: null,
-    pickStationPos: new THREE.Vector3(-1.25, 1.15, 1.25),
-    sortStationPos: new THREE.Vector3(1.25, 1.15, 1.25),
-    highlightMeshes: {}
+    pickStationPos: new THREE.Vector3(-1.359, 1.16, 1.359),
+    sortStationPos: new THREE.Vector3(1.359, 1.16, 1.359)
   })
 
   const progressRef = useRef(0)
   progressRef.current = progress
 
-  // Keep isPlayingRef in sync with state
   useEffect(() => {
     isPlayingRef.current = isPlaying
   }, [isPlaying])
 
-  // Handle external scroll progress from page scrolling
+  // Sync scroll progress from outer page scroll only if paused or scrolling
   useEffect(() => {
     if (externalScrollProgress !== null && !isPlayingRef.current) {
       setProgress(externalScrollProgress)
@@ -106,9 +118,10 @@ export default function PaprRobot3D({ theme = 'light', externalScrollProgress = 
     const scene = new THREE.Scene()
     scene.fog = new THREE.FogExp2(theme === 'dark' ? 0x0a1f2f : 0xeef3f6, 0.035)
 
-    // Camera
-    const camera = new THREE.PerspectiveCamera(42, width / height, 0.1, 100)
-    camera.position.set(3.8, 3.2, 4.4)
+    // Camera with mobile-first framing: expands FOV on narrow screens so arm & claw never clip
+    const initialFov = width < 560 ? 52 : (width < 900 ? 46 : 40)
+    const camera = new THREE.PerspectiveCamera(initialFov, width / height, 0.1, 100)
+    camera.position.set(4.0, 3.4, 4.8)
 
     // Renderer
     const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true, powerPreference: 'high-performance' })
@@ -117,7 +130,7 @@ export default function PaprRobot3D({ theme = 'light', externalScrollProgress = 
     renderer.shadowMap.enabled = true
     renderer.shadowMap.type = THREE.PCFSoftShadowMap
     renderer.toneMapping = THREE.ACESFilmicToneMapping
-    renderer.toneMappingExposure = 1.2
+    renderer.toneMappingExposure = 1.18
     container.innerHTML = ''
     container.appendChild(renderer.domElement)
 
@@ -125,14 +138,14 @@ export default function PaprRobot3D({ theme = 'light', externalScrollProgress = 
     const controls = new OrbitControls(camera, renderer.domElement)
     controls.enableDamping = true
     controls.dampingFactor = 0.05
-    controls.maxPolarAngle = Math.PI / 2 - 0.05
+    controls.maxPolarAngle = Math.PI / 2 - 0.04
     controls.minDistance = 2.0
-    controls.maxDistance = 9.0
+    controls.maxDistance = 9.5
     controls.target.set(0, 1.25, 0.3)
     controlsRef.current = controls
 
     // Lighting
-    const ambientLight = new THREE.AmbientLight(theme === 'dark' ? 0x223a4e : 0xd8e6ef, 1.5)
+    const ambientLight = new THREE.AmbientLight(theme === 'dark' ? 0x243e56 : 0xd8e6ef, 1.6)
     scene.add(ambientLight)
 
     const mainLight = new THREE.DirectionalLight(0xffffff, 2.4)
@@ -157,36 +170,53 @@ export default function PaprRobot3D({ theme = 'light', externalScrollProgress = 
     fillLight.position.set(-4, 4, -2)
     scene.add(fillLight)
 
-    // Materials
-    const metalAlumMat = new THREE.MeshStandardMaterial({
-      color: 0xc4ced6,
-      metalness: 0.85,
-      roughness: 0.28,
-      name: 'metal'
+    // Materials based on technical documentation
+    // 1. Two wooden plates (300 mm x 300 mm x 10 mm)
+    const woodPlateMat = new THREE.MeshStandardMaterial({
+      color: theme === 'dark' ? 0x3d2b1f : 0xba9a7a,
+      roughness: 0.75,
+      metalness: 0.05,
+      name: 'wood_base'
     })
-    const darkBracketMat = new THREE.MeshStandardMaterial({
-      color: 0x1a2026,
+
+    // 2. 26 mm x 26 mm aluminium channels
+    const alumChannelMat = new THREE.MeshStandardMaterial({
+      color: 0xcfd8dc,
+      metalness: 0.88,
+      roughness: 0.28,
+      name: 'aluminium_26mm'
+    })
+
+    // 3. 2 mm and 4 mm metal sheets (brackets)
+    const metalSheetMat = new THREE.MeshStandardMaterial({
+      color: 0x263238,
       metalness: 0.65,
       roughness: 0.45,
-      name: 'brackets'
+      name: 'metal_sheets'
     })
+
+    // 4. MG996R servo motor housing
     const servoMg996Mat = new THREE.MeshStandardMaterial({
       color: 0x11161b,
       metalness: 0.45,
       roughness: 0.4,
       name: 'mg996r'
     })
+
+    // 5. MG90S micro-servo motor housing
     const servoMg90sMat = new THREE.MeshStandardMaterial({
-      color: 0x0284c7, // Classic MG90S semi-translucent blue servo casing
-      metalness: 0.3,
+      color: 0x0284c7, // Distinctive blue casing of MG90S
+      metalness: 0.35,
       roughness: 0.35,
       name: 'mg90s'
     })
+
     const brassGearMat = new THREE.MeshStandardMaterial({
       color: 0xd4af37,
       metalness: 0.9,
       roughness: 0.25
     })
+
     const cyanGlowMat = new THREE.MeshStandardMaterial({
       color: 0x00f0ff,
       emissive: 0x00d4ff,
@@ -195,12 +225,14 @@ export default function PaprRobot3D({ theme = 'light', externalScrollProgress = 
       metalness: 0.2,
       name: 'cyanLink'
     })
+
     const clawRubberMat = new THREE.MeshStandardMaterial({
       color: 0x22262c,
       roughness: 0.85,
       metalness: 0.1,
       name: 'claw'
     })
+
     const payloadMat = new THREE.MeshStandardMaterial({
       color: 0xf59e0b, // Bright metallic gold/orange workpiece block
       metalness: 0.85,
@@ -213,126 +245,109 @@ export default function PaprRobot3D({ theme = 'light', externalScrollProgress = 
     grid.position.y = -0.01
     scene.add(grid)
 
-    // ----------------------------------------------------
-    // BUILD WORKBENCH & ROBOT AS PER USER CAD MODEL
-    // ----------------------------------------------------
+    // -------------------------------------------------------------------------
+    // BUILD PHYSICAL MODEL FROM "PAPR technical documentation.pdf"
+    // -------------------------------------------------------------------------
     const robotRoot = new THREE.Group()
     scene.add(robotRoot)
 
-    // 1. Dual-tier Workbench Base Table
+    // 1. Two Wooden Base Plates (300 mm x 300 mm x 10 mm)
+    // Scale: 300 mm -> 3.0 units, 10 mm -> 0.1 units
     const tableGroup = new THREE.Group()
     robotRoot.add(tableGroup)
 
-    // Top table plate
-    const topPlateGeo = new THREE.BoxGeometry(3.6, 0.1, 3.6)
-    const topPlate = new THREE.Mesh(topPlateGeo, metalAlumMat)
-    topPlate.position.y = 0.95
+    // Top wooden plate (300 mm x 300 mm x 10 mm) at y = 1.05
+    const topPlateGeo = new THREE.BoxGeometry(3.0, 0.10, 3.0)
+    const topPlate = new THREE.Mesh(topPlateGeo, woodPlateMat)
+    topPlate.position.y = 1.00
     topPlate.receiveShadow = true
     topPlate.castShadow = true
     tableGroup.add(topPlate)
 
-    // Bottom shelf plate
-    const bottomPlateGeo = new THREE.BoxGeometry(3.6, 0.08, 3.6)
-    const bottomPlate = new THREE.Mesh(bottomPlateGeo, metalAlumMat)
-    bottomPlate.position.y = 0.2
+    // Bottom wooden plate (300 mm x 300 mm x 10 mm) at y = 0.15
+    const bottomPlate = new THREE.Mesh(topPlateGeo, woodPlateMat)
+    bottomPlate.position.y = 0.15
     bottomPlate.receiveShadow = true
     bottomPlate.castShadow = true
     tableGroup.add(bottomPlate)
 
-    // 4 Corner vertical legs
-    const legGeo = new THREE.BoxGeometry(0.24, 0.95, 0.24)
+    // 4 Corner Legs (26 mm x 26 mm Aluminium Channels)
+    const legGeo = new THREE.BoxGeometry(0.26, 0.80, 0.26)
     const legPositions = [
-      [-1.65, 0.5, -1.65],
-      [1.65, 0.5, -1.65],
-      [-1.65, 0.5, 1.65],
-      [1.65, 0.5, 1.65]
+      [-1.37, 0.55, -1.37],
+      [1.37, 0.55, -1.37],
+      [-1.37, 0.55, 1.37],
+      [1.37, 0.55, 1.37]
     ]
     legPositions.forEach(pos => {
-      const leg = new THREE.Mesh(legGeo, metalAlumMat)
+      const leg = new THREE.Mesh(legGeo, alumChannelMat)
       leg.position.set(...pos)
       leg.castShadow = true
       leg.receiveShadow = true
       tableGroup.add(leg)
     })
 
-    // Corner bracket reinforcements with bolts
-    const bracketGeo = new THREE.BoxGeometry(0.3, 0.25, 0.05)
-    const boltGeo = new THREE.CylinderGeometry(0.02, 0.02, 0.06, 8)
-    const boltMat = new THREE.MeshStandardMaterial({ color: 0x111111, metalness: 0.9, roughness: 0.2 })
-
+    // Corner brackets from 2 mm / 4 mm metal sheets with bolts
+    const bracketGeo = new THREE.BoxGeometry(0.28, 0.22, 0.04)
     legPositions.forEach(pos => {
-      const cornerBracket = new THREE.Mesh(bracketGeo, darkBracketMat)
-      cornerBracket.position.set(pos[0], 0.88, pos[2] > 0 ? pos[2] + 0.12 : pos[2] - 0.12)
-      tableGroup.add(cornerBracket)
-
-      const bolt = new THREE.Mesh(boltGeo, boltMat)
-      bolt.rotation.x = Math.PI / 2
-      bolt.position.set(pos[0], 0.88, pos[2] > 0 ? pos[2] + 0.15 : pos[2] - 0.15)
-      tableGroup.add(bolt)
+      const b = new THREE.Mesh(bracketGeo, metalSheetMat)
+      b.position.set(pos[0], 0.92, pos[2] > 0 ? pos[2] + 0.13 : pos[2] - 0.13)
+      tableGroup.add(b)
     })
 
     // Stations
-    // Pick station: exactly at (-1.25, 1.03, 1.25) -> radius 1.768, angle -45°
-    const pickStationGeo = new THREE.CylinderGeometry(0.42, 0.45, 0.08, 32)
-    const pickStationMat = new THREE.MeshStandardMaterial({ color: 0x1e293b, roughness: 0.4, metalness: 0.7 })
-    const pickStation = new THREE.Mesh(pickStationGeo, pickStationMat)
-    pickStation.position.set(-1.25, 1.04, 1.25)
-    pickStation.receiveShadow = true
-    tableGroup.add(pickStation)
+    // Pick Station at x = -1.359, z = 1.359 (exactly aligned with arm reach at -45 deg)
+    const pickStationPos = new THREE.Vector3(-1.359, 1.05, 1.359)
+    const sortStationPos = new THREE.Vector3(1.359, 1.05, 1.359)
 
-    const pickRingGeo = new THREE.RingGeometry(0.24, 0.35, 32)
-    const pickRingMat = new THREE.MeshBasicMaterial({ color: 0x06b6d4, side: THREE.DoubleSide })
-    const pickRing = new THREE.Mesh(pickRingGeo, pickRingMat)
+    const stationPedestalGeo = new THREE.CylinderGeometry(0.42, 0.45, 0.08, 32)
+    const pickPedestal = new THREE.Mesh(stationPedestalGeo, metalSheetMat)
+    pickPedestal.position.copy(pickStationPos)
+    pickPedestal.receiveShadow = true
+    tableGroup.add(pickPedestal)
+
+    const pickRing = new THREE.Mesh(new THREE.RingGeometry(0.24, 0.35, 32), new THREE.MeshBasicMaterial({ color: 0x06b6d4, side: THREE.DoubleSide }))
     pickRing.rotation.x = -Math.PI / 2
-    pickRing.position.set(-1.25, 1.085, 1.25)
+    pickRing.position.set(pickStationPos.x, pickStationPos.y + 0.045, pickStationPos.z)
     tableGroup.add(pickRing)
 
-    // Sort station: exactly at (+1.25, 1.03, 1.25) -> radius 1.768, angle +45°
-    const sortStationGeo = new THREE.CylinderGeometry(0.45, 0.48, 0.12, 32)
-    const sortStationMat = new THREE.MeshStandardMaterial({ color: 0x0f766e, roughness: 0.35, metalness: 0.6 })
-    const sortStation = new THREE.Mesh(sortStationGeo, sortStationMat)
-    sortStation.position.set(1.25, 1.06, 1.25)
-    sortStation.receiveShadow = true
-    tableGroup.add(sortStation)
+    // Sort Station at x = 1.359, z = 1.359 (aligned at +45 deg)
+    const sortPedestal = new THREE.Mesh(stationPedestalGeo, new THREE.MeshStandardMaterial({ color: 0x0f766e, roughness: 0.4, metalness: 0.6 }))
+    sortPedestal.position.copy(sortStationPos)
+    sortPedestal.receiveShadow = true
+    tableGroup.add(sortPedestal)
 
-    const sortRingGeo = new THREE.RingGeometry(0.28, 0.38, 32)
-    const sortRingMat = new THREE.MeshBasicMaterial({ color: 0x10b981, side: THREE.DoubleSide })
-    const sortRing = new THREE.Mesh(sortRingGeo, sortRingMat)
+    const sortRing = new THREE.Mesh(new THREE.RingGeometry(0.26, 0.36, 32), new THREE.MeshBasicMaterial({ color: 0x10b981, side: THREE.DoubleSide }))
     sortRing.rotation.x = -Math.PI / 2
-    sortRing.position.set(1.25, 1.125, 1.25)
+    sortRing.position.set(sortStationPos.x, sortStationPos.y + 0.045, sortStationPos.z)
     tableGroup.add(sortRing)
 
-    // Target Payload Object
+    // Target Workpiece Object (size 0.22 x 0.22 x 0.22 cube, resting at y = 1.16)
     const payloadGroup = new THREE.Group()
     const payloadGeo = new THREE.BoxGeometry(0.22, 0.22, 0.22)
     const payloadMesh = new THREE.Mesh(payloadGeo, payloadMat)
     payloadMesh.castShadow = true
     payloadMesh.receiveShadow = true
     payloadGroup.add(payloadMesh)
-    payloadGroup.position.set(-1.25, 1.15, 1.25)
+    payloadGroup.position.set(pickStationPos.x, 1.16, pickStationPos.z)
     scene.add(payloadGroup)
 
-    // 2. ROBOTIC ARM ASSEMBLY (KINEMATIC HIERARCHY)
-    // Table Base Mount Plate
-    const baseMountPlateGeo = new THREE.BoxGeometry(0.72, 0.06, 0.72)
-    const baseMountPlate = new THREE.Mesh(baseMountPlateGeo, metalAlumMat)
-    baseMountPlate.position.set(0, 1.03, 0)
+    // 2. ROBOTIC ARM ASSEMBLY
+    // Centrally mounted base plate on top wooden plate
+    const baseMountPlateGeo = new THREE.BoxGeometry(0.70, 0.05, 0.70)
+    const baseMountPlate = new THREE.Mesh(baseMountPlateGeo, metalSheetMat)
+    baseMountPlate.position.set(0, 1.075, 0)
     baseMountPlate.castShadow = true
     tableGroup.add(baseMountPlate)
 
-    // Base Turntable Group (Rotates around Y axis: Yaw)
+    // RKI 1 (BASE) — Base Turntable Group (Yaw rotation around Y)
     const baseTurntable = new THREE.Group()
-    baseTurntable.position.set(0, 1.06, 0)
+    baseTurntable.position.set(0, 1.05, 0)
     robotRoot.add(baseTurntable)
 
-    // Base bracket housing MG996R servo
-    const baseBracket = new THREE.Mesh(new THREE.BoxGeometry(0.48, 0.32, 0.42), darkBracketMat)
-    baseBracket.position.set(0, 0.16, 0)
-    baseBracket.castShadow = true
-    baseTurntable.add(baseBracket)
-
+    // RKI 1 (BASE) Servo Housing (MG996R)
     const baseServoBody = new THREE.Mesh(new THREE.BoxGeometry(0.42, 0.22, 0.22), servoMg996Mat)
-    baseServoBody.position.set(0, 0.14, 0)
+    baseServoBody.position.set(0, 0.16, 0)
     baseTurntable.add(baseServoBody)
 
     const baseHorn = new THREE.Mesh(new THREE.CylinderGeometry(0.12, 0.12, 0.04, 16), brassGearMat)
@@ -340,148 +355,149 @@ export default function PaprRobot3D({ theme = 'light', externalScrollProgress = 
     baseTurntable.add(baseHorn)
 
     // Upright U-bracket fork holding shoulder joint
-    const forkLeft = new THREE.Mesh(new THREE.BoxGeometry(0.06, 0.46, 0.26), darkBracketMat)
-    forkLeft.position.set(-0.16, 0.52, 0)
+    const forkLeft = new THREE.Mesh(new THREE.BoxGeometry(0.06, 0.44, 0.26), metalSheetMat)
+    forkLeft.position.set(-0.16, 0.50, 0)
     forkLeft.castShadow = true
     baseTurntable.add(forkLeft)
 
-    const forkRight = new THREE.Mesh(new THREE.BoxGeometry(0.06, 0.46, 0.26), darkBracketMat)
-    forkRight.position.set(0.16, 0.52, 0)
+    const forkRight = new THREE.Mesh(new THREE.BoxGeometry(0.06, 0.44, 0.26), metalSheetMat)
+    forkRight.position.set(0.16, 0.50, 0)
     forkRight.castShadow = true
     baseTurntable.add(forkRight)
 
-    // MG996R Shoulder Servo housing
+    // RKI 2 (SHOULDER) Servo Housing (MG996R)
     const shoulderServoBody = new THREE.Mesh(new THREE.BoxGeometry(0.24, 0.38, 0.22), servoMg996Mat)
-    shoulderServoBody.position.set(0.24, 0.54, 0)
+    shoulderServoBody.position.set(0.24, 0.52, 0)
     shoulderServoBody.castShadow = true
     baseTurntable.add(shoulderServoBody)
 
-    // Shoulder Joint (Rotates around X axis: Pitch 1)
+    // RKI 2 (SHOULDER) Joint Pivot (θ₁)
     const shoulderJoint = new THREE.Group()
-    shoulderJoint.position.set(0, 0.58, 0)
+    shoulderJoint.position.set(0, 0.55, 0)
     baseTurntable.add(shoulderJoint)
 
     const shoulderPin = new THREE.Mesh(new THREE.CylinderGeometry(0.05, 0.05, 0.38, 16), brassGearMat)
     shoulderPin.rotation.z = Math.PI / 2
     shoulderJoint.add(shoulderPin)
 
-    // Lower Arm Link (Extruded aluminum channel, length = 1.25)
+    // Link 1 (l₁) — 26 mm x 26 mm Aluminium Channel Section (length = 1.20)
     const lowerArmGroup = new THREE.Group()
     shoulderJoint.add(lowerArmGroup)
 
-    const lowerArmChannel = new THREE.Mesh(new THREE.BoxGeometry(0.18, 1.25, 0.14), metalAlumMat)
-    lowerArmChannel.position.set(0, 0.625, 0)
+    const lowerArmChannel = new THREE.Mesh(new THREE.BoxGeometry(0.18, 1.20, 0.14), alumChannelMat)
+    lowerArmChannel.position.set(0, 0.60, 0)
     lowerArmChannel.castShadow = true
     lowerArmGroup.add(lowerArmChannel)
 
-    // Reinforcement bracket plates on lower arm
-    const sidePlateGeo = new THREE.BoxGeometry(0.2, 0.32, 0.16)
-    const sidePlateBottom = new THREE.Mesh(sidePlateGeo, darkBracketMat)
-    sidePlateBottom.position.set(0, 0.2, 0)
+    // Reinforcement plates (2 mm / 4 mm metal sheets)
+    const sidePlateGeo = new THREE.BoxGeometry(0.20, 0.30, 0.16)
+    const sidePlateBottom = new THREE.Mesh(sidePlateGeo, metalSheetMat)
+    sidePlateBottom.position.set(0, 0.18, 0)
     lowerArmGroup.add(sidePlateBottom)
 
-    const sidePlateTop = new THREE.Mesh(sidePlateGeo, darkBracketMat)
-    sidePlateTop.position.set(0, 1.05, 0)
+    const sidePlateTop = new THREE.Mesh(sidePlateGeo, metalSheetMat)
+    sidePlateTop.position.set(0, 1.02, 0)
     lowerArmGroup.add(sidePlateTop)
 
-    // Elbow Joint (Pivot at top of lower arm, rotates around X axis: Pitch 2)
+    // RKI 3 (ELBOW) Joint Pivot (θ₂)
     const elbowJoint = new THREE.Group()
-    elbowJoint.position.set(0, 1.25, 0)
+    elbowJoint.position.set(0, 1.20, 0)
     lowerArmGroup.add(elbowJoint)
 
-    const elbowBracket = new THREE.Mesh(new THREE.BoxGeometry(0.22, 0.28, 0.24), darkBracketMat)
+    const elbowBracket = new THREE.Mesh(new THREE.BoxGeometry(0.22, 0.28, 0.24), metalSheetMat)
     elbowBracket.position.set(0, 0.04, 0)
     elbowBracket.castShadow = true
     elbowJoint.add(elbowBracket)
 
-    const elbowServo = new THREE.Mesh(new THREE.BoxGeometry(0.22, 0.34, 0.2), servoMg996Mat)
+    // RKI 3 (ELBOW) Servo Housing (MG996R)
+    const elbowServo = new THREE.Mesh(new THREE.BoxGeometry(0.22, 0.34, 0.20), servoMg996Mat)
     elbowServo.position.set(-0.16, 0.06, 0)
     elbowServo.castShadow = true
     elbowJoint.add(elbowServo)
 
-    // Glowing Cyan Link Guide (as in user's CAD image)
+    // Cyan Guide Link (as in user CAD model & documentation)
     const cyanLinkMesh = new THREE.Mesh(new THREE.CylinderGeometry(0.065, 0.065, 0.58, 24), cyanGlowMat)
     cyanLinkMesh.rotation.x = Math.PI / 2
     cyanLinkMesh.position.set(0.12, 0.06, 0.26)
     cyanLinkMesh.castShadow = true
     elbowJoint.add(cyanLinkMesh)
 
-    // Forearm Section (Extruded aluminum channel, length = 1.1)
+    // Link 2 (l₂) — 26 mm x 26 mm Aluminium Channel Forearm (length = 1.05)
     const forearmGroup = new THREE.Group()
     elbowJoint.add(forearmGroup)
 
-    const forearmChannel = new THREE.Mesh(new THREE.BoxGeometry(0.16, 1.1, 0.12), metalAlumMat)
-    forearmChannel.position.set(0, 0.55, 0)
+    const forearmChannel = new THREE.Mesh(new THREE.BoxGeometry(0.16, 1.05, 0.12), alumChannelMat)
+    forearmChannel.position.set(0, 0.525, 0)
     forearmChannel.castShadow = true
     forearmGroup.add(forearmChannel)
 
-    const forearmTopClamp = new THREE.Mesh(new THREE.BoxGeometry(0.18, 0.22, 0.14), darkBracketMat)
-    forearmTopClamp.position.set(0, 0.95, 0)
-    forearmGroup.add(forearmTopClamp)
-
-    // Wrist Joint (Rotates around X axis: Pitch 3, driven by MG90S)
+    // RKI 4 (WRIST) Joint (θ₃)
     const wristJoint = new THREE.Group()
-    wristJoint.position.set(0, 1.1, 0)
+    wristJoint.position.set(0, 1.05, 0)
     forearmGroup.add(wristJoint)
 
-    // MG90S Micro Servo body
+    // RKI 4 (WRIST) Servo Housing (MG90S)
     const mg90sBody = new THREE.Mesh(new THREE.BoxGeometry(0.14, 0.22, 0.12), servoMg90sMat)
     mg90sBody.position.set(0, 0.08, 0.06)
     mg90sBody.castShadow = true
     wristJoint.add(mg90sBody)
 
-    const mg90sHorn = new THREE.Mesh(new THREE.CylinderGeometry(0.04, 0.04, 0.03, 12), brassGearMat)
-    mg90sHorn.rotation.z = Math.PI / 2
-    mg90sHorn.position.set(0.08, 0.14, 0.06)
-    wristJoint.add(mg90sHorn)
+    // Vertical Guide Column on Wrist
+    const verticalGuideColumn = new THREE.Mesh(new THREE.BoxGeometry(0.12, 0.70, 0.12), alumChannelMat)
+    verticalGuideColumn.position.set(0, -0.15, 0)
+    wristJoint.add(verticalGuideColumn)
 
-    // Gripper Base Group (Claw Mechanism)
+    // Vertical Slide Group (moves downward along Y to reach object height)
+    const verticalSlide = new THREE.Group()
+    wristJoint.add(verticalSlide)
+
+    // Gripper Base & MG90S pincer actuator on vertical slide
     const gripperBaseGroup = new THREE.Group()
-    gripperBaseGroup.position.set(0, 0.22, 0)
-    wristJoint.add(gripperBaseGroup)
+    gripperBaseGroup.position.set(0, 0, 0)
+    verticalSlide.add(gripperBaseGroup)
 
-    const gripperBackplate = new THREE.Mesh(new THREE.BoxGeometry(0.24, 0.06, 0.2), darkBracketMat)
-    gripperBackplate.position.set(0, 0.03, 0)
+    const gripperBackplate = new THREE.Mesh(new THREE.BoxGeometry(0.24, 0.06, 0.20), metalSheetMat)
+    gripperBackplate.position.set(0, -0.03, 0)
     gripperBaseGroup.add(gripperBackplate)
 
-    // Left Claw Finger
+    // Left Claw Finger (Articulated Linkage)
     const leftClaw = new THREE.Group()
-    leftClaw.position.set(-0.09, 0.06, 0)
+    leftClaw.position.set(-0.09, -0.06, 0)
     gripperBaseGroup.add(leftClaw)
 
-    const fingerGeo = new THREE.BoxGeometry(0.05, 0.36, 0.07)
-    const leftFinger1 = new THREE.Mesh(fingerGeo, darkBracketMat)
-    leftFinger1.position.set(-0.04, 0.18, 0)
-    leftFinger1.rotation.z = -0.25
+    const fingerGeo = new THREE.BoxGeometry(0.05, 0.34, 0.07)
+    const leftFinger1 = new THREE.Mesh(fingerGeo, metalSheetMat)
+    leftFinger1.position.set(-0.04, -0.16, 0)
+    leftFinger1.rotation.z = 0.25
     leftFinger1.castShadow = true
     leftClaw.add(leftFinger1)
 
     const tipGeo = new THREE.BoxGeometry(0.04, 0.16, 0.06)
     const leftTip = new THREE.Mesh(tipGeo, clawRubberMat)
-    leftTip.position.set(0.03, 0.35, 0)
-    leftTip.rotation.z = 0.4
+    leftTip.position.set(0.03, -0.32, 0)
+    leftTip.rotation.z = -0.4
     leftClaw.add(leftTip)
 
-    // Right Claw Finger
+    // Right Claw Finger (Articulated Linkage)
     const rightClaw = new THREE.Group()
-    rightClaw.position.set(0.09, 0.06, 0)
+    rightClaw.position.set(0.09, -0.06, 0)
     gripperBaseGroup.add(rightClaw)
 
-    const rightFinger1 = new THREE.Mesh(fingerGeo, darkBracketMat)
-    rightFinger1.position.set(0.04, 0.18, 0)
-    rightFinger1.rotation.z = 0.25
+    const rightFinger1 = new THREE.Mesh(fingerGeo, metalSheetMat)
+    rightFinger1.position.set(0.04, -0.16, 0)
+    rightFinger1.rotation.z = -0.25
     rightFinger1.castShadow = true
     rightClaw.add(rightFinger1)
 
     const rightTip = new THREE.Mesh(tipGeo, clawRubberMat)
-    rightTip.position.set(-0.03, 0.35, 0)
-    rightTip.rotation.z = -0.4
+    rightTip.position.set(-0.03, -0.32, 0)
+    rightTip.rotation.z = 0.4
     rightClaw.add(rightTip)
 
-    // Grip Anchor (Exact 3D point between the two claw fingertips)
+    // Exact grip anchor between the rubber pads at fingertip center
     const gripAnchor = new THREE.Group()
-    gripAnchor.position.set(0, 0.38, 0)
-    gripperBaseGroup.add(gripAnchor)
+    gripAnchor.position.set(0, -0.40, 0)
+    verticalSlide.add(gripAnchor)
 
     // Store refs
     kinematicRefs.current = {
@@ -489,12 +505,13 @@ export default function PaprRobot3D({ theme = 'light', externalScrollProgress = 
       shoulderJoint,
       elbowJoint,
       wristJoint,
+      verticalSlide,
       leftClaw,
       rightClaw,
       gripAnchor,
       payload: payloadGroup,
-      pickStationPos: new THREE.Vector3(-1.25, 1.15, 1.25),
-      sortStationPos: new THREE.Vector3(1.25, 1.15, 1.25)
+      pickStationPos: new THREE.Vector3(-1.359, 1.16, 1.359),
+      sortStationPos: new THREE.Vector3(1.359, 1.16, 1.359)
     }
 
     // Set initial pose
@@ -509,19 +526,19 @@ export default function PaprRobot3D({ theme = 'light', externalScrollProgress = 
       const delta = Math.min((time - lastTime) / 1000, 0.1)
       lastTime = time
 
-      // Automatic playback
+      // Auto cycle when playing
       if (isPlayingRef.current) {
         setProgress(p => {
-          let next = p + delta * 0.14
+          let next = p + delta * 0.11
           if (next >= 1.0) next = 0.0
           return next
         })
       }
 
-      // Live kinematic calculation
+      // Compute exact positions and apply kinematic transforms
       applyKinematics(progressRef.current, tempVec)
 
-      // Pulsing glow on cyan CAD link
+      // Pulsing cyan indicator link
       cyanGlowMat.emissiveIntensity = 1.4 + Math.sin(time * 0.005) * 0.6
 
       controls.update()
@@ -530,12 +547,12 @@ export default function PaprRobot3D({ theme = 'light', externalScrollProgress = 
 
     animFrameRef.current = requestAnimationFrame(animate)
 
-    // Resize
     const onResize = () => {
       if (!container) return
       const w = container.clientWidth
       const h = container.clientHeight
       camera.aspect = w / h
+      camera.fov = w < 560 ? 52 : (w < 900 ? 46 : 40)
       camera.updateProjectionMatrix()
       renderer.setSize(w, h)
     }
@@ -552,13 +569,14 @@ export default function PaprRobot3D({ theme = 'light', externalScrollProgress = 
     }
   }, [theme])
 
-  // Complete Forward Kinematics & Payload Locking
+  // Complete Forward Kinematics, Vertical Descent & Rigid Object Attachment
   const applyKinematics = (p, tempVec = new THREE.Vector3()) => {
     const {
       baseTurntable,
       shoulderJoint,
       elbowJoint,
       wristJoint,
+      verticalSlide,
       leftClaw,
       rightClaw,
       gripAnchor,
@@ -567,7 +585,7 @@ export default function PaprRobot3D({ theme = 'light', externalScrollProgress = 
       sortStationPos
     } = kinematicRefs.current
 
-    if (!baseTurntable || !shoulderJoint || !elbowJoint || !wristJoint || !leftClaw || !rightClaw) return
+    if (!baseTurntable || !shoulderJoint || !elbowJoint || !wristJoint || !verticalSlide || !leftClaw || !rightClaw) return
 
     const lerp = (a, b, t) => a + (b - a) * Math.max(0, Math.min(1, t))
     const smooth = (t) => {
@@ -575,127 +593,121 @@ export default function PaprRobot3D({ theme = 'light', externalScrollProgress = 
       return c * c * (3 - 2 * c)
     }
 
-    let baseYaw = 0
-    let shoulderPitch = 0.48   // Standby: ~28°
-    let elbowPitch = -0.66     // Standby: ~-38°
-    let wristPitch = 0.18      // Standby wrist
-    let clawSpread = 0.05      // 0.0 = tight clamp, 0.16 = open
-    let isGrippingPayload = false
+    // Kinematic joint angles from technical equations
+    const s = 0.82 // θ₁ (Shoulder) = 47°
+    const e = 0.65 // θ₂ (Elbow) = 37°
+    const w = -(s + e) // θ₃ (Wrist) orienting the vertical slide strictly vertical
 
-    // Target pick and sort angles
-    const pickYaw = -0.785     // -45° towards Pick Station
-    const sortYaw = 0.785      // +45° towards Sorting Station
-    const reachShoulder = 1.12 // 64° forward extension
-    const reachElbow = -1.48   // -85° reach down towards table
-    const reachWrist = 0.36    // level claw facing downwards
+    shoulderJoint.rotation.x = s
+    elbowJoint.rotation.x = e
+    wristJoint.rotation.x = w
 
-    const liftShoulder = 0.38  // 22° vertical lift
-    const liftElbow = -0.56    // -32° high clearance
-    const liftWrist = 0.18
+    const pickYaw = -0.785398 // -45° to Pick Station
+    const sortYaw = 0.785398  // +45° to Sorting Station
+    const maxDescent = 0.9643 // Exact stroke required to reach workpiece at Y = 1.16
 
-    if (p < 0.22) {
-      // Phase 1: Standby (0.0) -> Reach to pick station (0.22)
-      const t = smooth(p / 0.22)
+    let baseYaw = pickYaw
+    let slideY = 0.0
+    let clawSpread = 0.05
+    let isCarrying = false
+
+    if (p < 0.15) {
+      // Step 1: Move to Object (rotates base to pick station, positions claw directly above)
+      const t = smooth(p / 0.15)
       baseYaw = lerp(0, pickYaw, t)
-      shoulderPitch = lerp(0.48, reachShoulder, t)
-      elbowPitch = lerp(-0.66, reachElbow, t)
-      wristPitch = lerp(0.18, reachWrist, t)
-      clawSpread = lerp(0.05, 0.16, t) // Open claw wide to prepare for grasp
-      isGrippingPayload = false
-    } else if (p < 0.40) {
-      // Phase 2: At Pick Station -> Close Claw around Payload (0.22 -> 0.40)
-      const t = smooth((p - 0.22) / 0.18)
+      slideY = 0.0 // retracted at top
+      clawSpread = lerp(0.05, 0.18, t) // claw fingers open ready
+      isCarrying = false
+    } else if (p < 0.30) {
+      // Step 2: Descend (vertical arm segment moves downward, bringing claw to object height)
+      const t = smooth((p - 0.15) / 0.15)
       baseYaw = pickYaw
-      shoulderPitch = reachShoulder
-      elbowPitch = reachElbow
-      wristPitch = reachWrist
-      clawSpread = lerp(0.16, 0.0, t) // Close jaws tightly
-      isGrippingPayload = t > 0.4 // Payload becomes attached to claw
-    } else if (p < 0.60) {
-      // Phase 3: High-Torque Lift from table (0.40 -> 0.60)
-      const t = smooth((p - 0.40) / 0.20)
+      slideY = -lerp(0, maxDescent, t) // Visibly descends!
+      clawSpread = 0.18 // claw fingers open wide
+      isCarrying = false
+    } else if (p < 0.45) {
+      // Step 3: Open & Grip (claw fingers close firmly around workpiece)
+      const t = smooth((p - 0.30) / 0.15)
       baseYaw = pickYaw
-      shoulderPitch = lerp(reachShoulder, liftShoulder, t) // Arm bends back & lifts up!
-      elbowPitch = lerp(reachElbow, liftElbow, t)         // Elbow pulls payload upwards!
-      wristPitch = lerp(reachWrist, liftWrist, t)
-      clawSpread = 0.0 // Clamped tight
-      isGrippingPayload = true
-    } else if (p < 0.80) {
-      // Phase 4: Spatial 3D Transfer across workspace (0.60 -> 0.80)
-      const t = smooth((p - 0.60) / 0.20)
-      baseYaw = lerp(pickYaw, sortYaw, t) // Sweeps across table from -45° to +45°!
-      // Add slight vertical arc dynamics
-      const arc = Math.sin(t * Math.PI) * 0.12
-      shoulderPitch = liftShoulder - arc * 0.5
-      elbowPitch = liftElbow + arc * 0.5
-      wristPitch = liftWrist
-      clawSpread = 0.0 // Clamped tight
-      isGrippingPayload = true
-    } else if (p < 0.92) {
-      // Phase 5: Lower arm over Sorting Station & Release (0.80 -> 0.92)
-      const t = smooth((p - 0.80) / 0.12)
+      slideY = -maxDescent
+      clawSpread = lerp(0.18, 0.0, t) // closes tightly around object
+      isCarrying = t > 0.4
+    } else if (p < 0.58) {
+      // Step 4: Lift (vertical segment rises while holding object, object follows claw)
+      const t = smooth((p - 0.45) / 0.13)
+      baseYaw = pickYaw
+      slideY = -lerp(maxDescent, 0, t) // rises back up
+      clawSpread = 0.0 // clamped tight
+      isCarrying = true
+    } else if (p < 0.76) {
+      // Step 5: Transport (arm moves held object to target position without slipping)
+      const t = smooth((p - 0.58) / 0.18)
+      baseYaw = lerp(pickYaw, sortYaw, t) // sweeps smoothly to sorting station
+      slideY = 0.0
+      clawSpread = 0.0
+      isCarrying = true
+    } else if (p < 0.90) {
+      // Step 6: Lower & Release (claw descends to destination, releases object, lifts away)
+      const t = (p - 0.76) / 0.14
       baseYaw = sortYaw
-      shoulderPitch = lerp(liftShoulder, reachShoulder, t) // Lowers down to bin!
-      elbowPitch = lerp(liftElbow, reachElbow, t)
-      wristPitch = lerp(liftWrist, reachWrist, t)
-
-      // Near bottom of stroke, claw opens
-      if (t > 0.65) {
-        const tOpen = (t - 0.65) / 0.35
-        clawSpread = lerp(0.0, 0.16, tOpen)
-        isGrippingPayload = false
-      } else {
+      if (t < 0.55) {
+        // Descend to sorting pedestal
+        const tDown = smooth(t / 0.55)
+        slideY = -lerp(0, maxDescent, tDown)
         clawSpread = 0.0
-        isGrippingPayload = true
+        isCarrying = true
+      } else {
+        // Open claw to release
+        slideY = -maxDescent
+        const tRelease = smooth((t - 0.55) / 0.45)
+        clawSpread = lerp(0.0, 0.18, tRelease)
+        isCarrying = false
       }
     } else {
-      // Phase 6: Retract & Return to Standby (0.92 -> 1.0)
-      const t = smooth((p - 0.92) / 0.08)
-      baseYaw = lerp(sortYaw, 0, t)
-      shoulderPitch = lerp(reachShoulder, 0.48, t)
-      elbowPitch = lerp(reachElbow, -0.66, t)
-      wristPitch = lerp(reachWrist, 0.18, t)
-      clawSpread = 0.08
-      isGrippingPayload = false
+      // Step 7: Repeat (lifts away and returns to initial pick point)
+      const t = smooth((p - 0.90) / 0.10)
+      slideY = -lerp(maxDescent, 0, t)
+      baseYaw = lerp(sortYaw, pickYaw, t)
+      clawSpread = 0.05
+      isCarrying = false
     }
 
-    // Apply rotations directly to joints
+    // Apply joint rotation and slide translation
     baseTurntable.rotation.y = baseYaw
-    shoulderJoint.rotation.x = shoulderPitch
-    elbowJoint.rotation.x = elbowPitch
-    wristJoint.rotation.x = wristPitch
+    verticalSlide.position.y = slideY
 
-    // Symmetrical claw jaw articulation
+    // Articulate claw fingers
     leftClaw.position.x = -0.09 - clawSpread
-    leftClaw.rotation.z = -clawSpread * 2.0
+    leftClaw.rotation.z = clawSpread * 1.8
 
     rightClaw.position.x = 0.09 + clawSpread
-    rightClaw.rotation.z = clawSpread * 2.0
+    rightClaw.rotation.z = -clawSpread * 1.8
 
-    // Synchronize payload position
+    // Coordinate object attachment
     if (payload) {
-      if (isGrippingPayload && gripAnchor) {
-        // Physical lock: workpiece is rigidly clamped between claw pads!
+      if (isCarrying && gripAnchor) {
+        // Object is rigidly clamped between fingers — follows claw in world space!
         gripAnchor.getWorldPosition(tempVec)
         payload.position.copy(tempVec)
-      } else if (p >= 0.88) {
-        // Released at sorting bin
+      } else if (p >= 0.85) {
+        // Released in sorting receptacle
         payload.position.copy(sortStationPos)
       } else {
-        // At pick station
+        // Resting on pick station
         payload.position.copy(pickStationPos)
       }
     }
 
-    // Update live angle telemetry
-    setLiveAngles({
+    // Update live telemetry
+    setTelemetry({
       yaw: `${Math.round((baseYaw * 180) / Math.PI)}°`,
-      shoulder: `${Math.round((shoulderPitch * 180) / Math.PI)}°`,
-      elbow: `${Math.round((elbowPitch * 180) / Math.PI)}°`,
-      claw: clawSpread < 0.03 ? 'Clamped (Grip)' : 'Open (Release)'
+      shoulder: '47°',
+      elbow: '37°',
+      slide: `${Math.round(Math.abs(slideY) * 100)} mm`,
+      claw: clawSpread < 0.04 ? 'Clamped (18°)' : 'Open (70°)'
     })
 
-    // Active stage index
+    // Update active stage indicator
     let currIdx = 0
     for (let i = STAGES.length - 1; i >= 0; i--) {
       if (p >= STAGES[i].time - 0.02) {
@@ -706,14 +718,14 @@ export default function PaprRobot3D({ theme = 'light', externalScrollProgress = 
     setActiveStageIndex(currIdx)
   }
 
-  // Toggle Play / Pause cycle
+  // Controls: Pause / Resume
   const togglePlay = () => {
     const next = !isPlaying
     setIsPlaying(next)
     isPlayingRef.current = next
   }
 
-  // Slider scrub
+  // Scrub timeline
   const handleScrub = (e) => {
     const val = parseFloat(e.target.value)
     setProgress(val)
@@ -723,7 +735,7 @@ export default function PaprRobot3D({ theme = 'light', externalScrollProgress = 
     }
   }
 
-  // Jump to specific stage
+  // Jump to specific step
   const jumpToStage = (idx) => {
     setProgress(STAGES[idx].time)
     if (isPlaying) {
@@ -732,7 +744,7 @@ export default function PaprRobot3D({ theme = 'light', externalScrollProgress = 
     }
   }
 
-  // Reset 3D Camera view
+  // Reset 3D Camera without altering playback state
   const handleResetCamera = () => {
     if (controlsRef.current) {
       controlsRef.current.reset()
@@ -747,8 +759,8 @@ export default function PaprRobot3D({ theme = 'light', externalScrollProgress = 
       {/* Control Ribbon */}
       <div className="papr-control-ribbon">
         <div className="papr-title-group">
-          <div className="papr-badge">4-DOF + 1 Gripper</div>
-          <h4>Pick & Place Robotic Arm Kinematic Engine</h4>
+          <div className="papr-badge">RKI 1–4 Kinematics</div>
+          <h4>Pick & Place Robotic Arm (PAPR)</h4>
         </div>
         <div className="papr-actions">
           <button
@@ -757,13 +769,13 @@ export default function PaprRobot3D({ theme = 'light', externalScrollProgress = 
             onClick={() => setViewMode('3d')}
             title="Interactive 3-D WebGL Simulation"
           >
-            <span>◈</span> 3-D WebGL
+            <span>◈</span> 3D WebGL
           </button>
           <button
             type="button"
             className={`papr-pill-btn ${viewMode === 'cad-overlay' ? 'active' : ''}`}
             onClick={() => setViewMode('cad-overlay')}
-            title="View Original CAD Model Render"
+            title="View Genuine CAD Blueprint from Documentation"
           >
             <span>📐</span> CAD Model
           </button>
@@ -772,13 +784,13 @@ export default function PaprRobot3D({ theme = 'light', externalScrollProgress = 
             className={`papr-pill-btn play-btn ${isPlaying ? 'playing' : ''}`}
             onClick={togglePlay}
           >
-            {isPlaying ? '⏸ Pause Cycle' : '▶ Play Cycle'}
+            {isPlaying ? '⏸ Pause' : '▶ Resume'}
           </button>
           <button
             type="button"
             className="papr-pill-btn"
             onClick={handleResetCamera}
-            title="Reset 3D Camera Angle"
+            title="Reset 3D Camera View"
           >
             ↺ Reset View
           </button>
@@ -798,17 +810,17 @@ export default function PaprRobot3D({ theme = 'light', externalScrollProgress = 
         {viewMode === 'cad-overlay' && (
           <div className="papr-cad-view">
             <div className="papr-cad-card">
-              <div className="papr-cad-tag">Original CAD Assembly Blueprint</div>
+              <div className="papr-cad-tag">Visual Representation of the Robotic Arm (PDF Fig 1 & Fig 10)</div>
               <img
-                src="/assets/papr-cad-render.png"
-                alt="PAPR CAD Mechanical System"
+                src="/assets/components/papr_cad_robot.jpg"
+                alt="PAPR CAD Mechanical System from PDF"
                 className="papr-cad-image"
               />
               <div className="papr-cad-caption">
                 <p>
-                  <strong>Physical Kinematics:</strong> Structural aluminum chassis with dual-tier workbench,
-                  base swivel turntable, twin MG996R high-torque shoulder/elbow servos, cyan guide link,
-                  MG90S micro-servo wrist drive, and parallel linkage claw gripper.
+                  <strong>Documented Construction:</strong> Two wooden plates (300 mm × 300 mm × 10 mm),
+                  26 mm × 26 mm aluminium channels, 2 mm and 4 mm metal sheets, MG996R servo motors (RKI 1 Base, RKI 2 Shoulder, RKI 3 Elbow),
+                  MG90S servo motor (RKI 4 Wrist and pincer claw).
                 </p>
                 <button
                   type="button"
@@ -816,7 +828,7 @@ export default function PaprRobot3D({ theme = 'light', externalScrollProgress = 
                   onClick={() => setViewMode('3d')}
                   style={{ marginTop: 12, padding: '9px 18px', fontSize: '0.78rem' }}
                 >
-                  Return to 3-D Kinematic Animation <span>↖</span>
+                  Return to 3D Simulation <span>↖</span>
                 </button>
               </div>
             </div>
@@ -828,7 +840,7 @@ export default function PaprRobot3D({ theme = 'light', externalScrollProgress = 
           {/* HUD Status Card */}
           <div className="papr-hud-card">
             <div className="papr-hud-header">
-              <span className="papr-pulse-indicator"></span>
+              <span className={`papr-pulse-indicator ${isPlaying ? '' : 'paused'}`}></span>
               <span className="papr-hud-stage">{currentStage.label}</span>
             </div>
             <h5 className="papr-hud-title">{currentStage.heading}</h5>
@@ -836,38 +848,37 @@ export default function PaprRobot3D({ theme = 'light', externalScrollProgress = 
 
             <div className="papr-hud-specs">
               <div className="papr-spec-item">
-                <span className="papr-spec-key">Base Turntable</span>
-                <span className="papr-spec-val">{liveAngles.yaw}</span>
+                <span className="papr-spec-key">RKI 1 (BASE)</span>
+                <span className="papr-spec-val">{telemetry.yaw}</span>
               </div>
               <div className="papr-spec-item">
-                <span className="papr-spec-key">Shoulder Pitch</span>
-                <span className="papr-spec-val">{liveAngles.shoulder}</span>
+                <span className="papr-spec-key">Vertical Descent</span>
+                <span className="papr-spec-val">{telemetry.slide}</span>
               </div>
               <div className="papr-spec-item">
-                <span className="papr-spec-key">Elbow Pitch</span>
-                <span className="papr-spec-val">{liveAngles.elbow}</span>
+                <span className="papr-spec-key">RKI 2 & 3 (ARM)</span>
+                <span className="papr-spec-val">θ₁: {telemetry.shoulder} | θ₂: {telemetry.elbow}</span>
               </div>
               <div className="papr-spec-item">
-                <span className="papr-spec-key">Claw Jaws (MG90S)</span>
-                <span className="papr-spec-val">{liveAngles.claw}</span>
+                <span className="papr-spec-key">Gripper (MG90S)</span>
+                <span className="papr-spec-val">{telemetry.claw}</span>
               </div>
             </div>
           </div>
 
           {/* Component Callout Badges */}
           <div className="papr-components-filter">
-            <span className="filter-label">Mechanical Highlights:</span>
-            <span className="filter-tag">Dual-Tier Base</span>
-            <span className="filter-tag">MG996R Servos (High Torque)</span>
-            <span className="filter-tag">Extruded Links</span>
+            <span className="filter-label">Verified PDF Specs:</span>
+            <span className="filter-tag">300×300×10mm Base</span>
+            <span className="filter-tag">26×26mm Channels</span>
+            <span className="filter-tag">MG996R (RKI 1–3)</span>
+            <span className="filter-tag highlight-blue">MG90S (RKI 4 & Claw)</span>
             <span className="filter-tag highlight-cyan">Cyan Link Guide</span>
-            <span className="filter-tag highlight-blue">MG90S Servo</span>
-            <span className="filter-tag">Claw Gripper</span>
           </div>
 
           {/* Interaction Hint */}
           <div className="papr-hint">
-            <span>🖱 Drag to rotate 360° • Scroll/Pinch to zoom • Drag slider or click Play to animate</span>
+            <span>🖱 Drag to rotate 360° • Pinch/wheel to zoom • Pause/Resume controls playback</span>
           </div>
         </div>
       </div>
@@ -875,8 +886,8 @@ export default function PaprRobot3D({ theme = 'light', externalScrollProgress = 
       {/* Scrubber & Timeline Navigation Bar */}
       <div className="papr-scrubber-bar">
         <div className="papr-scrub-row">
-          <span className="scrub-label">Pick & Place Kinematic Timeline</span>
-          <span className="scrub-percent">{Math.round(progress * 100)}% Complete</span>
+          <span className="scrub-label">Pick & Place Sequence Timeline</span>
+          <span className="scrub-percent">{Math.round(progress * 100)}%</span>
         </div>
         <input
           type="range"
@@ -889,7 +900,7 @@ export default function PaprRobot3D({ theme = 'light', externalScrollProgress = 
           aria-label="Kinematic animation timeline scrubber"
         />
 
-        {/* Phase Buttons */}
+        {/* 7 Phase Buttons */}
         <div className="papr-stage-buttons">
           {STAGES.map((stg, i) => (
             <button

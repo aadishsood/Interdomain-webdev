@@ -1,13 +1,13 @@
 export const TEAM_MEMBERS = [
   { memberNumber: 1, name: 'Abhinav K Anand', domain: 'SAMBED', instagram: 'https://www.instagram.com/abhi_tboat', linkedin: 'https://in.linkedin.com/in/abhinav-k-anand-bb277937a', image: '/assets/team/member-1.png', objectPosition: 'center 32%' },
-  { memberNumber: 2, name: 'Team Member 2', domain: 'Domain', instagram: 'https://www.instagram.com/', linkedin: 'https://www.linkedin.com/', image: '' },
+  { memberNumber: 2, name: 'Team Member 2', domain: 'DOMAIN', instagram: 'https://www.instagram.com/', linkedin: 'https://www.linkedin.com/', image: '' },
   { memberNumber: 3, name: 'Aadish Sood', domain: 'SPACED (WebDev)', instagram: 'https://www.instagram.com/sood_aadi008', linkedin: 'https://www.linkedin.com/in/aadish-sood-752265435', image: '/assets/team/member-3.png' },
   { memberNumber: 4, name: 'Sairav Kharga', domain: 'SPACED (Coding)', instagram: 'https://www.instagram.com/skhrg__', linkedin: 'https://www.linkedin.com/in/sairav-kharga-9a7aa7428', image: '/assets/team/member-4.png', objectPosition: 'center 33%' },
   { memberNumber: 5, name: 'Debangshu Banik', domain: 'SPACED (Coding)', instagram: 'https://www.instagram.com/debangshu_banik/', linkedin: 'https://www.linkedin.com/in/debangshu-banik-784603280', image: '/assets/team/member-5.png' },
   { memberNumber: 6, name: 'Devi Jahnavi', domain: 'SIESED', instagram: 'https://www.instagram.com/jahnavi._.9', linkedin: 'https://www.linkedin.com/in/devi-jahnavi-914580426', image: '/assets/team/member-6.jpeg' },
   { memberNumber: 7, name: 'Mathew', domain: 'SIESED', instagram: 'https://www.instagram.com/john_mathew_1707_', linkedin: '', image: '/assets/team/member-7.jpeg' },
-  { memberNumber: 8, name: 'Team Member 8', domain: 'Domain', instagram: 'https://www.instagram.com/', linkedin: 'https://www.linkedin.com/', image: '' },
-  { memberNumber: 9, name: 'Team Member 9', domain: 'Domain', instagram: 'https://www.instagram.com/', linkedin: 'https://www.linkedin.com/', image: '' }
+  { memberNumber: 8, name: 'Team Member 8', domain: 'DOMAIN', instagram: 'https://www.instagram.com/', linkedin: 'https://www.linkedin.com/', image: '' },
+  { memberNumber: 9, name: 'Team Member 9', domain: 'DOMAIN', instagram: 'https://www.instagram.com/', linkedin: 'https://www.linkedin.com/', image: '' }
 ]
 
 export const NAV_LINKS = [
@@ -19,26 +19,99 @@ export const NAV_LINKS = [
   { href: '#gallery', label: 'Gallery' }
 ]
 
+// Authentic components extracted directly from "PAPR technical documentation.pdf"
 export const COMPONENTS = [
-  { no: '01', title: 'Camera & vision', desc: 'Captures live views of incoming objects for shape, structure, and position analysis.' },
-  { no: '02', title: 'Sensors', desc: 'Detect object presence and fine position along the pick and place path.' },
-  { no: '03', title: 'Robotic arm', desc: 'Multi-axis arm that lifts, moves, and places each object at its target.' },
-  { no: '04', title: 'Gripper', desc: 'End effector that adapts its grasp to different shapes and sizes.' },
-  { no: '05', title: 'Conveyor', desc: 'Moves objects steadily through the vision and pick zones.' },
-  { no: '06', title: 'Controller', desc: 'The brain that turns vision output into arm and gripper actions.' }
+  {
+    id: 'esp32',
+    title: 'ESP32 DevKit V1',
+    category: 'Electronics Division',
+    spec: 'Main Controller',
+    desc: 'Executes control commands, processes computer vision coordinate inputs, and outputs PWM control signals to arm actuators and gripper servo.',
+    image: '/assets/components/esp32_devkit_v1.png'
+  },
+  {
+    id: 'servos',
+    title: 'MG996R & MG90S Servos',
+    category: 'Actuator Division',
+    spec: 'RKI 1–3: MG996R | RKI 4 & Claw: MG90S',
+    desc: 'High-torque metal-gear MG996R servos provide driving torque for Base (RKI 1), Shoulder (RKI 2), and Elbow (RKI 3). Compact MG90S drives Wrist (RKI 4) and pincer claw.',
+    image: '/assets/components/servo_motor.png'
+  },
+  {
+    id: 'battery',
+    title: '3S Battery Pack',
+    category: 'Power Division',
+    spec: '11.1V Nominal DC Supply',
+    desc: 'Provides main DC power source to the controller, regulated power rails, and actuator drive circuits through a dedicated protection network.',
+    image: '/assets/components/battery_3s.jpg'
+  },
+  {
+    id: 'buck',
+    title: 'Buck Converters',
+    category: 'Voltage Regulation',
+    spec: 'LM2596 Step-Down Modules',
+    desc: 'Step down main battery DC voltage to steady, regulated logic and actuator levels for the ESP32, gripper actuator, and high-current servo circuits.',
+    image: '/assets/components/buck_converter.jpg'
+  },
+  {
+    id: 'protection',
+    title: '10 A Fuse & Emergency Switch',
+    category: 'Protection Circuit',
+    spec: 'Overcurrent & Instant Disconnect',
+    desc: 'The 10 A rated fuse safeguards circuits against current spikes, while the emergency stop switch provides an immediate hardware disconnect for safety.',
+    image: '/assets/components/emergency_switch.png'
+  },
+  {
+    id: 'terminals',
+    title: 'Screw Terminal Blocks',
+    category: 'Interconnects',
+    spec: 'Heavy-Duty PCB Screw Terminals',
+    desc: 'Provides secure, vibration-resistant connection points for power distribution, signal routing, servo cables, and sensor lines.',
+    image: '/assets/components/terminal_blocks.png'
+  },
+  {
+    id: 'aluminium',
+    title: 'Aluminium Channels',
+    category: 'Mechanical Framework',
+    spec: '26 mm × 26 mm Extrusions',
+    desc: 'Constructs the lightweight yet rigid structural framework for the arm links. Offers flat mounting surfaces and high bending stiffness during movement.',
+    image: '/assets/components/aluminium_channel.jpg'
+  },
+  {
+    id: 'metal_sheets',
+    title: 'Metal Sheets',
+    category: 'Fabrication Elements',
+    spec: '2 mm & 4 mm Thickness',
+    desc: 'Used to fabricate custom mounting brackets and motor supports. 2 mm sheets support light mounts, while 4 mm sheets provide high rigidity for high-torque joints.',
+    image: '/assets/components/metal_sheets.jpg'
+  },
+  {
+    id: 'wooden_plates',
+    title: 'Dual Wooden Base Plates',
+    category: 'Supporting Structure',
+    spec: '300 mm × 300 mm × 10 mm (2 pcs)',
+    desc: 'Two precision plates provide a stable supporting foundation for the robotic mechanism, accommodating applied arm moments and damping vibrations.',
+    image: '/assets/components/wooden_plates.jpg'
+  }
 ]
 
+// Technical problem & solution based on Section 1, 2, 5 of PAPR technical documentation
 export const SOLUTIONS = [
-  { no: '01', title: 'Map the gaps', desc: 'Surface where language, data, and decisions stop lining up across teams.' },
-  { no: '02', title: 'Build a shared frame', desc: 'Give every contributor a common visual model without flattening their expertise.' },
-  { no: '03', title: 'Move from insight to action', desc: 'Translate connections into clear next steps, measurable experiments, and momentum.' }
+  {
+    title: 'Camera Vision & Object Classification',
+    desc: 'Camera observes the designated working area, capturing shape, size, orientation, and geometric features to determine item identity and sorting target.'
+  },
+  {
+    title: 'Coordinate Calibration & Real-World Mapping',
+    desc: 'Calibration procedures convert camera field-of-view pixels into real-world X, Y, and Z coordinates relative to the robotic arm coordinate frame.'
+  },
+  {
+    title: 'Inverse Kinematic Trajectory Planning',
+    desc: 'Analytical 3-link kinematic equations compute exact joint angles (θ₁, θ₂, θ₃) so the claw descends directly to object height without positioning errors.'
+  },
+  {
+    title: 'Autonomous Gripping & Segregated Sorting',
+    desc: 'ESP32 controller directs pincer claw closure, vertical lift clearance, spatial arc transfer, and controlled placement at assigned destination points.'
+  }
 ]
 
-export const GALLERY_TILES = [
-  'Core / 001 — orbit study',
-  'Material / 014 — warm signal',
-  'Field / 022 — blue hour',
-  'Prototype / 008 — new paths',
-  'Archive / 031 — soft edges',
-  'Notes / 005 — move together'
-]

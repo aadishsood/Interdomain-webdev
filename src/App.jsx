@@ -11,7 +11,7 @@ import Footer from './components/Footer.jsx'
 
 export default function App() {
   const [theme, setTheme] = useState(() => {
-    const saved = localStorage.getItem('interdomain-theme')
+    const saved = localStorage.getItem('paprdom-theme') || localStorage.getItem('interdomain-theme')
     return saved === 'dark' || saved === 'light' ? saved : null
   })
 
@@ -22,7 +22,7 @@ export default function App() {
   const toggleTheme = () => {
     const next = document.documentElement.dataset.theme === 'dark' ? 'light' : 'dark'
     document.documentElement.dataset.theme = next
-    localStorage.setItem('interdomain-theme', next)
+    localStorage.setItem('paprdom-theme', next)
     setTheme(next)
   }
 

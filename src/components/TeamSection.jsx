@@ -65,14 +65,16 @@ export default function TeamSection() {
   const [activeMember, setActiveMember] = useState(null)
   const toggle = n => setActiveMember(cur => (cur === n ? null : n))
 
+  // Only show members with actual names (filter out placeholders)
+  const realMembers = TEAM_MEMBERS.filter(m => !m.name.startsWith('Team Member'))
+
   return (
     <section className="wrap" id="team">
       <div className="section-head">
-        <div><h2>The people<br />behind the map.</h2></div>
-        <p>A small, cross-functional team with a shared belief: better connections make better outcomes.</p>
+        <div><h2>The team<br />behind PAPR.</h2></div>
       </div>
       <div className="team-grid" id="teamGrid">
-        {TEAM_MEMBERS.map(m => (
+        {realMembers.map(m => (
           <MemberCard key={m.memberNumber} member={m} active={activeMember === m.memberNumber} onActivate={toggle} />
         ))}
       </div>

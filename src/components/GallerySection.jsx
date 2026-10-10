@@ -1,15 +1,25 @@
-import { GALLERY_TILES } from '../data/site.js'
-
 export default function GallerySection() {
+  const tiles = [
+    { span: true },
+    {},
+    {},
+    {},
+    {},
+    {}
+  ]
+
   return (
     <section className="wrap" id="gallery">
       <div className="section-head">
-        <div><h2>Fragments of<br />the process.</h2></div>
-        <p>Field notes, visual experiments, and the in-between moments that shaped the final system.</p>
+        <div><h2>Gallery</h2></div>
       </div>
       <div className="gallery">
-        {GALLERY_TILES.map(t => (
-          <div className="tile" key={t}><span>{t}</span></div>
+        {tiles.map((t, i) => (
+          <div
+            className="tile"
+            key={i}
+            style={{ gridRow: t.span ? 'span 2' : undefined }}
+          />
         ))}
       </div>
     </section>
