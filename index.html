@@ -38,6 +38,9 @@
     .button:hover { transform:translateY(-2px); box-shadow:0 10px 20px rgba(0,0,0,.12); }
     .button.alt { background:transparent; color:var(--ink); border:1px solid var(--line); }
     .hero-art { position:relative; min-height:480px; display:grid; place-items:center; }
+    .molten-metal { position:absolute; inset:4%; width:92%; height:92%; border-radius:50%; opacity:.96; mix-blend-mode:screen; filter:drop-shadow(0 24px 50px rgba(6,182,212,.24)); }
+    .molten-badge { position:absolute; z-index:3; top:12%; right:8%; padding:8px 11px; border:1px solid rgba(125,225,255,.42); border-radius:999px; color:#dffaff; background:rgba(10,31,47,.58); backdrop-filter:blur(10px); font-size:.58rem; letter-spacing:.09em; }
+    .hero-art .orb { z-index:2; opacity:.7; }
     .orb { width:min(390px,80vw); aspect-ratio:1; border-radius:50%; background:radial-gradient(circle at 35% 25%,#efffbc 0 5%,#b8f33d 20%,#497d45 54%,#143d35 78%); box-shadow:inset -28px -22px 55px rgba(0,0,0,.2), 18px 22px 0 rgba(184,243,61,.25); animation:float 6s ease-in-out infinite; position:relative; }
     .orb:before,.orb:after { content:''; position:absolute; inset:13% 8%; border:1px solid rgba(255,255,255,.45); border-radius:50%; transform:rotate(24deg); }
     .orb:after { inset:28% -6%; transform:rotate(-36deg); }
@@ -106,7 +109,7 @@
 <body>
   <header><div class="wrap nav"><a class="brand" href="#home">PAPRDOM</a><nav id="navMenu"><a href="#home">Home</a><a href="#model">3-D model</a><a href="#components">Components</a><a href="#solution">Problem &amp; solution</a><a href="#team">Team</a><a href="#gallery">Gallery</a><button class="theme" id="themeToggle" type="button"><span class="theme-dot"></span><span id="themeLabel">Dark mode</span></button></nav><button class="hamburger" id="navToggle" type="button" aria-expanded="false" aria-controls="navMenu" aria-label="Open menu"><span></span><span></span><span></span></button></div></header>
   <main>
-    <section class="wrap hero" id="home"><div><h1>PAPR <em>— Pick and Place Robot.</em></h1><p>The Pick and Place Robot (PAPR) is an automated robotic system, which identifies, classifies, picks, and sorts objects into their respective designated locations. The system makes use of computer vision to analyze the shape, structure, and position of incoming objects and make decisions regarding their identification, and placement.</p><div class="actions"><a class="button alt" href="#solution">Read our approach</a></div></div><div class="hero-art"><div class="orbit"><i></i></div><div class="orb"></div></div></section>
+    <section class="wrap hero" id="home"><div><h1>PAPR <em>— Pick and Place Robot.</em></h1><p>The Pick and Place Robot (PAPR) is an automated robotic system, which identifies, classifies, picks, and sorts objects into their respective designated locations. The system makes use of computer vision to analyze the shape, structure, and position of incoming objects and make decisions regarding their identification, and placement.</p><div class="actions"><a class="button alt" href="#solution">Read our approach</a></div></div><div class="hero-art"><canvas class="molten-metal" id="moltenMetal" aria-label="Animated molten metal background"></canvas><span class="molten-badge">MOLTEN METAL / FROST</span><div class="orbit"><i></i></div><div class="orb"></div></div></section>
     <section class="wrap" id="model"><div class="section-head"><p style="max-width:460px">Rotate your perspective. The core is the same, but every domain reveals a different edge of the story.</p></div><div class="model-shell"><div class="model-card"><div class="wire"></div><div class="wire"></div><div class="wire"></div><div class="model-core"></div></div><div class="model-copy"><h3>The PAPRDOM core</h3><p>A conceptual 3-D model of the relationships our project maps: shared context at the centre, with distinct disciplines orbiting around it.</p><div class="stat"><span>Dimensions</span><b>3 × 3 × 3</b></div><div class="stat"><span>Connected nodes</span><b>08 active</b></div><div class="stat"><span>View mode</span><b>Exploratory</b></div><a class="button" href="#gallery" style="margin-top:22px">See visual studies <span>↘</span></a></div></div></section>
     <section class="wrap" id="components"><div class="section-head"><div><h2>Inside the<br/>system.</h2></div><p>Every module of PAPR, from seeing to gripping, works as one connected pipeline.</p></div><div class="components-grid"><article class="person"><div class="avatar">01</div><div><h3>Camera &amp; vision</h3><p>Captures live views of incoming objects for shape, structure, and position analysis.</p></div></article><article class="person"><div class="avatar">02</div><div><h3>Sensors</h3><p>Detect object presence and fine position along the pick and place path.</p></div></article><article class="person"><div class="avatar">03</div><div><h3>Robotic arm</h3><p>Multi-axis arm that lifts, moves, and places each object at its target.</p></div></article><article class="person"><div class="avatar">04</div><div><h3>Gripper</h3><p>End effector that adapts its grasp to different shapes and sizes.</p></div></article><article class="person"><div class="avatar">05</div><div><h3>Conveyor</h3><p>Moves objects steadily through the vision and pick zones.</p></div></article><article class="person"><div class="avatar">06</div><div><h3>Controller</h3><p>The brain that turns vision output into arm and gripper actions.</p></div></article></div></section>
     <section class="wrap" id="solution"><div class="section-head"><div><h2>Complexity is<br/>a design brief.</h2></div><p>We start by naming the friction, then turn it into a system people can navigate with confidence.</p></div><div class="problem"><p class="big-note">When domains work in isolation, important signals get lost in translation. Interdomain makes the invisible handoffs visible.</p><div class="solution-list"><div class="solution"><div class="solution-no">01</div><div><h3>Map the gaps</h3><p>Surface where language, data, and decisions stop lining up across teams.</p></div></div><div class="solution"><div class="solution-no">02</div><div><h3>Build a shared frame</h3><p>Give every contributor a common visual model without flattening their expertise.</p></div></div><div class="solution"><div class="solution-no">03</div><div><h3>Move from insight to action</h3><p>Translate connections into clear next steps, measurable experiments, and momentum.</p></div></div></div></div></section>
@@ -119,6 +122,39 @@
     const saved = localStorage.getItem('interdomain-theme'); if (saved) root.dataset.theme = saved;
     const update = () => { const dark = root.dataset.theme === 'dark'; label.textContent = dark ? 'Light mode' : 'Dark mode'; toggle.setAttribute('aria-label', dark ? 'Switch to light theme' : 'Switch to dark theme'); };
     toggle.addEventListener('click', () => { root.dataset.theme = root.dataset.theme === 'dark' ? 'light' : 'dark'; localStorage.setItem('interdomain-theme', root.dataset.theme); update(); }); update();
+
+    // ---- Local Molten Metal background inspired by the React Bits reference ----
+    const molten = document.getElementById('moltenMetal');
+    if (molten) {
+      const ctx = molten.getContext('2d');
+      const blobs = [
+        { x:.28, y:.38, r:.28, speed:.00042, phase:0.2 },
+        { x:.68, y:.32, r:.24, speed:-.00035, phase:1.8 },
+        { x:.56, y:.73, r:.3, speed:.00031, phase:3.2 },
+        { x:.2, y:.76, r:.2, speed:-.0005, phase:4.4 }
+      ];
+      let width = 0, height = 0, dpr = 1, pointer = { x:.5, y:.5 };
+      const resizeMolten = () => { const box = molten.getBoundingClientRect(); dpr = Math.min(window.devicePixelRatio || 1, 2); width = Math.max(1, box.width); height = Math.max(1, box.height); molten.width = width * dpr; molten.height = height * dpr; ctx.setTransform(dpr,0,0,dpr,0,0); };
+      const drawMolten = time => {
+        ctx.clearRect(0,0,width,height);
+        ctx.fillStyle = '#0a1f2f'; ctx.fillRect(0,0,width,height);
+        ctx.globalCompositeOperation = 'screen'; ctx.filter = 'blur(18px)';
+        blobs.forEach((b, i) => {
+          const drift = time * b.speed + b.phase;
+          const x = (b.x + Math.sin(drift * 1.7 + i) * .12 + (pointer.x - .5) * .035) * width;
+          const y = (b.y + Math.cos(drift * 1.25 + i) * .13 + (pointer.y - .5) * .035) * height;
+          const radius = b.r * Math.min(width,height) * (1 + Math.sin(drift + i) * .08);
+          const gradient = ctx.createRadialGradient(x - radius*.18, y - radius*.24, radius*.02, x, y, radius);
+          gradient.addColorStop(0, '#f5feff'); gradient.addColorStop(.1, '#8cecff'); gradient.addColorStop(.34, '#06b6d4'); gradient.addColorStop(.72, '#1e70bf'); gradient.addColorStop(1, '#0a1f2f');
+          ctx.fillStyle = gradient; ctx.beginPath(); ctx.arc(x,y,radius,0,Math.PI*2); ctx.fill();
+        });
+        ctx.filter = 'none'; ctx.globalCompositeOperation = 'lighter'; ctx.lineWidth = 1.2;
+        for (let i=0;i<12;i++) { const y = height*(.14+i*.07) + Math.sin(time*.0007+i)*18; ctx.strokeStyle = `rgba(168,244,255,${.08 + (i%3)*.025})`; ctx.beginPath(); for (let x=0;x<=width;x+=14) { const yy=y + Math.sin(x*.018+time*.0008+i)*18 + Math.cos(x*.009-time*.0005)*11; x===0 ? ctx.moveTo(x,yy) : ctx.lineTo(x,yy); } ctx.stroke(); }
+        ctx.globalCompositeOperation = 'source-over'; requestAnimationFrame(drawMolten);
+      };
+      molten.addEventListener('pointermove', e => { const box = molten.getBoundingClientRect(); pointer = { x:(e.clientX-box.left)/box.width, y:(e.clientY-box.top)/box.height }; });
+      window.addEventListener('resize', resizeMolten, { passive:true }); resizeMolten(); requestAnimationFrame(drawMolten);
+    }
 
     // ---- Team members 1-9: edit ONLY this data to fill a slot (card design is untouched) ----
     // image: '' shows a numbered placeholder; a URL/path shows the photo (cropped with object-fit, never stretched).
