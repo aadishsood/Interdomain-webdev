@@ -1,13 +1,15 @@
+import { objectPosition } from "three/tsl"
+
 export const TEAM_MEMBERS = [
   { memberNumber: 1, name: 'Abhinav K Anand', domain: 'SAMBED', instagram: 'https://www.instagram.com/abhi_tboat', linkedin: 'https://in.linkedin.com/in/abhinav-k-anand-bb277937a', image: '/assets/team/member-1.png', objectPosition: 'center 32%' },
-  { memberNumber: 2, name: 'Team Member 2', domain: 'DOMAIN', instagram: 'https://www.instagram.com/', linkedin: 'https://www.linkedin.com/', image: '' },
+  { memberNumber: 2, name: 'Prarthana M', domain: 'SAMBED', instagram: 'https://www.instagram.com/prarthzzz_._?stkn=NGNvOWp0ZnY2N2Jn', linkedin: 'https://www.linkedin.com/in/prarthana-m-7a45ab3a0', image: '/assets/team/member-2.png',objectPosition:'center 18%' },
   { memberNumber: 3, name: 'Aadish Sood', domain: 'SPACED (WebDev)', instagram: 'https://www.instagram.com/sood_aadi008', linkedin: 'https://www.linkedin.com/in/aadish-sood-752265435', image: '/assets/team/member-3.png' },
   { memberNumber: 4, name: 'Sairav Kharga', domain: 'SPACED (Coding)', instagram: 'https://www.instagram.com/skhrg__', linkedin: 'https://www.linkedin.com/in/sairav-kharga-9a7aa7428', image: '/assets/team/member-4.png', objectPosition: 'center 33%' },
   { memberNumber: 5, name: 'Debangshu Banik', domain: 'SPACED (Coding)', instagram: 'https://www.instagram.com/debangshu_banik/', linkedin: 'https://www.linkedin.com/in/debangshu-banik-784603280', image: '/assets/team/member-5.png' },
   { memberNumber: 6, name: 'Devi Jahnavi', domain: 'SIESED', instagram: 'https://www.instagram.com/jahnavi._.9', linkedin: 'https://www.linkedin.com/in/devi-jahnavi-914580426', image: '/assets/team/member-6.jpeg' },
-  { memberNumber: 7, name: 'Mathew', domain: 'SIESED', instagram: 'https://www.instagram.com/john_mathew_1707_', linkedin: '', image: '/assets/team/member-7.jpeg' },
-  { memberNumber: 8, name: 'Team Member 8', domain: 'DOMAIN', instagram: 'https://www.instagram.com/', linkedin: 'https://www.linkedin.com/', image: '' },
-  { memberNumber: 9, name: 'Team Member 9', domain: 'DOMAIN', instagram: 'https://www.instagram.com/', linkedin: 'https://www.linkedin.com/', image: '' }
+  { memberNumber: 7, name: 'Mathew', domain: 'SIESED', instagram: 'https://www.instagram.com/john_mathew_1707_', linkedin: '', image: '/assets/team/member-7.jpeg', objectPosition: 'center 66%' },
+  { memberNumber: 8, name: 'Parambrota Joarder', domain: 'MCSOCD (VFX/GFX)', instagram: 'https://www.instagram.com/poruneedschickfileh', linkedin: 'https://www.linkedin.com/in/parambrota-joarder-589622380', image: '/assets/team/member-8.png', objectPosition: 'center 40%' },
+  { memberNumber: 9, name: 'Aadithya Mohandas', domain: 'MCSOCD (Corporate)', instagram: 'https://www.instagram.com/aadifr_', linkedin: 'https://www.linkedin.com/in/aadithya-mohandas-547605418', image: '/assets/team/member-9.png', objectPosition: 'center 14%' }
 ]
 
 export const NAV_LINKS = [
