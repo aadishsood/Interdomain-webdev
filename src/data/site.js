@@ -33,7 +33,7 @@ export const COMPONENTS = [
   },
   {
     id: 'servos',
-    title: 'MG996R & MG90S Servos',
+    title: 'MG90S Servos',
     category: 'Actuator Division',
     spec: 'RKI 1–3: MG996R | RKI 4 & Claw: MG90S',
     desc: 'High-torque metal-gear MG996R servos provide driving torque for Base (RKI 1), Shoulder (RKI 2), and Elbow (RKI 3). Compact MG90S drives Wrist (RKI 4) and pincer claw.',
