@@ -29,7 +29,7 @@ export const COMPONENTS = [
     category: 'Electronics Division',
     spec: 'Main Controller',
     desc: 'Executes control commands, processes computer vision coordinate inputs, and outputs PWM control signals to arm actuators and gripper servo.',
-    image: '/assets/components/esp32_devkit_v1.png'
+    image: '/assets/components/battery_3s.jpg'
   },
   {
     id: 'servos',
@@ -45,7 +45,7 @@ export const COMPONENTS = [
     category: 'Power Division',
     spec: '11.1V Nominal DC Supply',
     desc: 'Provides main DC power source to the controller, regulated power rails, and actuator drive circuits through a dedicated protection network.',
-    image: '/assets/components/battery_3s.jpg'
+    image: '/assets/components/esp32_devkit_v1.png'
   },
   {
     id: 'buck',
